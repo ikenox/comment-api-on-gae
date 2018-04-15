@@ -4,8 +4,9 @@ Commenting system run on GAE
 
 ## run on local server
 
-```
-dev_appserver.py app/app.yaml
+```shell
+$ export GOPATH=$(pwd)
+$ dev_appserver.py app/app.yaml
 ```
 
 
