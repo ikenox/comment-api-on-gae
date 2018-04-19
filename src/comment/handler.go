@@ -10,3 +10,7 @@ type Handler struct{}
 func (h Handler) List(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hello, world!")
 }
+
+func (h Handler) Add(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Hello, world!")
+}
