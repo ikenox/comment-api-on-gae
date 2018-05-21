@@ -1,16 +1,24 @@
 package controller
 
 import (
-	"domain"
 	"fmt"
 	"net/http"
+
+	"google.golang.org/appengine/datastore"
+
+	"appengine"
 )
+
+var count = 0
 
 // CommentController handles request which is related to comment domain.
 type CommentController struct{}
 
 func (c *CommentController) List(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, fmt.Sprintf("%s", &domain.Post{}))
+	count++
+	ctx := appengine.NewContext(r)
+	datastore.NewKey()
+	fmt.Fprint(w, fmt.Sprintf("%d", count))
 }
 
 func (c *CommentController) Add(w http.ResponseWriter, r *http.Request) {
