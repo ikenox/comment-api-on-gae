@@ -6,16 +6,16 @@ import (
 
 // PostRepository stores Post
 type PostRepository interface {
-	Add(post domain.Post)
-	Delete(post domain.Post)
-	FindByPage(page domain.Page)
+	Add(post *domain.Post)
+	Delete(post *domain.Post)
+	FindByPage(page *domain.Page)
 }
 
 type CommentUseCase struct {
-	PostRepository postRepository
+	postRepository PostRepository
 }
 
 func (c *CommentUseCase) Post(comment string) {
-	post := &Post{}
-	postRepository.Add()
+	post := &domain.Post{}
+	c.postRepository.Add(post)
 }

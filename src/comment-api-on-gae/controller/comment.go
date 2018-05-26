@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"google.golang.org/appengine/datastore"
-
-	"appengine"
 )
 
 var count = 0
@@ -16,8 +13,8 @@ type CommentController struct{}
 
 func (c *CommentController) List(w http.ResponseWriter, r *http.Request) {
 	count++
-	ctx := appengine.NewContext(r)
-	datastore.NewKey()
+	//ctx := appengine.NewContext(r)
+	//datastore.NewKey()
 	fmt.Fprint(w, fmt.Sprintf("%d", count))
 }
 
