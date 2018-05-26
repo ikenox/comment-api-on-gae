@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"domain"
-	"usecase"
+	"comment-api-on-gae/domain"
+	"comment-api-on-gae/usecase"
 )
 
 type PostDataStore struct {

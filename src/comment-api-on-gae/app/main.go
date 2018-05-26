@@ -1,7 +1,7 @@
-package comment_api_on_gae
+package app
 
 import (
-	"controller"
+	"comment-api-on-gae/controller"
 	"net/http"
 
 	"github.com/gorilla/mux"

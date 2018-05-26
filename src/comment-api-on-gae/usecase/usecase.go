@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"domain"
+	"comment-api-on-gae/domain"
 )
 
 // PostRepository stores Post
