@@ -17,5 +17,3 @@ type Post struct {
 	isDeleted bool
 	postedAt  time.Time
 }
-
-type Foo Entity

@@ -15,7 +15,13 @@ type CommentUseCase struct {
 	postRepository PostRepository
 }
 
-func (c *CommentUseCase) Post(comment string) {
+func NewCommentUseCase(repository PostRepository) *CommentUseCase {
+	return &CommentUseCase{
+		postRepository: repository,
+	}
+}
+
+func (c *CommentUseCase) Post(pageUrl string, comment string) {
 	post := &domain.Post{}
 	c.postRepository.Add(post)
 }
