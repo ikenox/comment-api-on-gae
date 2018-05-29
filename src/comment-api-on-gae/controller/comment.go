@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"comment-api-on-gae/vendor/google.golang.org/appengine"
+	"google.golang.org/appengine"
 )
 
 var count = 0
