@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"google.golang.org/appengine"
+	"comment-api-on-gae/vendor/google.golang.org/appengine"
 )
 
 var count = 0
@@ -21,12 +21,6 @@ func (c *CommentController) List(w http.ResponseWriter, r *http.Request) {
 	count++
 	count++
 	count++
-	count++
-	count++
-	count++
-		count++
-    	count++
-    	count++
 	fmt.Fprint(w, fmt.Sprintf("%d", count))
 }
 
