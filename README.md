@@ -2,11 +2,14 @@
 
 Commenting system run on GAE
 
-## run on local server
+## Requirements
+
+- docker-compose
+
+## Run
 
 ```shell
-$ export GOPATH=$(pwd)
-$ dev_appserver.py app/app.yaml
+$ docker-compose up app
 ```
 
 
