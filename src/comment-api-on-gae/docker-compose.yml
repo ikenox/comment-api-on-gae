@@ -1,0 +1,16 @@
+version: '2'
+services:
+  app:
+    image: mercari/appengine-go:latest
+    working_dir: /go/src/comment-api-on-gae
+    command: make serve-dev
+    ports:
+      - 8080:8080
+      - 8000:8000
+    volumes:
+      - .:/go/src/comment-api-on-gae
+  dep:
+    image: instrumentisto/dep:0.3.2
+    working_dir: /go/src/comment-api-on-gae
+    volumes:
+      - .:/go/src/comment-api-on-gae

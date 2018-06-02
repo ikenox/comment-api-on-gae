@@ -10,6 +10,4 @@ func init() {
 	http.HandleFunc("/comment/list", commentController.List)
 	http.HandleFunc("/comment/add", commentController.Add)
 	http.ListenAndServe(":8080", nil)
-
-	print("foo")
 }

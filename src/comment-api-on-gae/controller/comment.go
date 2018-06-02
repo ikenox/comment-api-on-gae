@@ -19,8 +19,6 @@ type CommentController struct{}
 
 func (c *CommentController) List(w http.ResponseWriter, r *http.Request) {
 	count++
-	count++
-	count++
 	fmt.Fprint(w, fmt.Sprintf("%d", count))
 }
 
