@@ -3,11 +3,13 @@ package main
 import (
 	"comment-api-on-gae/controller"
 	"net/http"
+
+	"github.com/labstack/echo"
 )
 
 func init() {
-	commentController := controller.NewCommentController()
-	http.HandleFunc("/comment/list", commentController.List)
-	http.HandleFunc("/comment/add", commentController.Add)
+	pageController := controller.NewPageController()
+	http.HandleFunc("/comment/list", pageController.List)
+	http.HandleFunc("/comment/add", pageController.Add)
 	http.ListenAndServe(":8080", nil)
 }
