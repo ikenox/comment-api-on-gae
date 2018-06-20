@@ -17,16 +17,14 @@ func NewCommentRepository(ctx context.Context) usecase.CommentRepository {
 	}
 }
 
-func (r *commentRepository) NextCommentId() *domain.CommentId {
-	panic("implement me")
+func (r *commentRepository) NextCommentId() domain.CommentId {
+	return 1111
 }
 
 func (r *commentRepository) Add(post *domain.Comment) {
-	panic("implement me")
 }
 
 func (r *commentRepository) Delete(post *domain.Comment) {
-	panic("implement me")
 }
 
 func (r *commentRepository) FindByPage(page *domain.Page) {

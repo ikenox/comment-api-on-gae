@@ -19,7 +19,8 @@ func NewCommentUseCase(commentRepository CommentRepository, pageRepository PageR
 	}
 }
 
-func (u *CommentUseCase) PostNewComment(url string, name string, commentText string) {
+func (u *CommentUseCase) PostComment(url string, name string, commentText string) {
+	// get or create page
 	page := u.pageRepository.FindByUrl(url)
 	if page == nil {
 		page = domain.NewPage(u.pageRepository.NextPageId(), url)
@@ -27,25 +28,33 @@ func (u *CommentUseCase) PostNewComment(url string, name string, commentText str
 
 	commenter := domain.NewCommenter(u.commenterRepository.NextCommenterId(), name)
 
-	comment := commenter.CreateNewComment(commentText, page, time.Now())
+	comment := commenter.NewComment(commentText, page, time.Now())
 	u.commentRepository.Add(comment)
+}
+
+func (u *CommentUseCase) GetComments(url string) []*domain.Comment {
+	page := u.pageRepository.FindByUrl(url)
+	if page == nil {
+		return []*domain.Comment{}
+	}
+	comments := u.commentRepository.FindByPageId(page.PageId())
+	return comments
 }
 
 type Repository interface {
 }
 
-
 type CommentRepository interface {
 	Repository
-	NextCommentId() *domain.CommentId
+	NextCommentId() domain.CommentId
 	Add(comment *domain.Comment)
 	Delete(comment *domain.Comment)
-	FindByPage(page *domain.Page)
+	FindByPageId(page domain.PageId) []*domain.Comment
 }
 
 type PageRepository interface {
 	Repository
-	NextPageId() *domain.PageId
+	NextPageId() domain.PageId
 	Add(post *domain.Comment)
 	Delete(post *domain.Comment)
 	FindByUrl(url string) *domain.Page
@@ -53,7 +62,7 @@ type PageRepository interface {
 
 type CommenterRepository interface {
 	Repository
-	NextCommenterId() *domain.CommenterId
+	NextCommenterId() domain.CommenterId
 	Add(post *domain.Commenter)
 	Delete(post *domain.Commenter)
 	FindById(page *domain.Page) *domain.Commenter

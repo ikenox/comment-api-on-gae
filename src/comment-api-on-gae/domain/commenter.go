@@ -5,11 +5,11 @@ import "time"
 type CommenterId int
 type Commenter struct {
 	Entity
-	commenterId *CommenterId
+	commenterId CommenterId
 	name        string
 }
 
-func (c *Commenter) CreateNewComment(text string, page *Page, commentedAt time.Time) *Comment {
+func (c *Commenter) NewComment(text string, page *Page, commentedAt time.Time) *Comment {
 	return &Comment{
 		commenterId: c.commenterId,
 		pageId:      page.pageId,
@@ -18,7 +18,7 @@ func (c *Commenter) CreateNewComment(text string, page *Page, commentedAt time.T
 	}
 }
 
-func NewCommenter(commenterId *CommenterId, name string) *Commenter{
+func NewCommenter(commenterId CommenterId, name string) *Commenter{
 	return &Commenter{
 		commenterId: commenterId,
 		name: name,

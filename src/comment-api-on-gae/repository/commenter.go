@@ -17,18 +17,16 @@ func NewCommenterRepository(ctx context.Context) usecase.CommenterRepository {
 	}
 }
 
-func (c *commenterRepository) NextCommenterId() *domain.CommenterId {
-	panic("implement me")
+func (c *commenterRepository) NextCommenterId() domain.CommenterId {
+	return 1
 }
 
 func (c *commenterRepository) Add(post *domain.Commenter) {
-	panic("implement me")
 }
 
 func (c *commenterRepository) Delete(post *domain.Commenter) {
-	panic("implement me")
 }
 
 func (c *commenterRepository) FindById(page *domain.Page) *domain.Commenter {
-	panic("implement me")
+	return domain.NewCommenter(111, "Bob")
 }

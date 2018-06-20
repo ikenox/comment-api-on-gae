@@ -12,23 +12,15 @@ import (
 
 var count = 0
 
-// CommentController handles request which is related to comment domain.
-type CommentController struct{}
+type PageController struct{}
 
-func NewCommentController() *CommentController {
-	return &CommentController{}
+func NewPageController() *PageController {
+	return &PageController{}
 }
 
-func (c *CommentController) List(w http.ResponseWriter, r *http.Request) {
-	count++
-	fmt.Fprint(w, fmt.Sprintf("%d", count))
-}
-
-func (c *CommentController) Add(w http.ResponseWriter, r *http.Request) {
+func (c *PageController) List(w http.ResponseWriter, r *http.Request) {
 	var params struct {
-		pageUrl string
-		text    string
-		name    string
+		PageUrl string
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -42,7 +34,29 @@ func (c *CommentController) Add(w http.ResponseWriter, r *http.Request) {
 		repository.NewCommentRepository(ctx),
 		repository.NewPageRepository(ctx),
 		repository.NewCommenterRepository(ctx),
-	).PostNewComment(params.pageUrl, params.name, params.text)
+	).GetComments(params.PageUrl)
 
-	fmt.Fprint(w, fmt.Sprintf("%s, %s", params.pageUrl, params.text))
+}
+
+func (c *PageController) Add(w http.ResponseWriter, r *http.Request) {
+	var params struct {
+		PageUrl string
+		Text    string
+		Name    string
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&params)
+	if err != nil {
+		panic(err)
+	}
+
+	ctx := appengine.NewContext(r)
+	usecase.NewCommentUseCase(
+		repository.NewCommentRepository(ctx),
+		repository.NewPageRepository(ctx),
+		repository.NewCommenterRepository(ctx),
+	).PostComment(params.PageUrl, params.Name, params.Text)
+
+	fmt.Fprint(w, fmt.Sprintf("%s, %s", params.PageUrl, params.Text))
 }

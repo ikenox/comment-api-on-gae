@@ -17,18 +17,16 @@ func NewPageRepository(ctx context.Context) usecase.PageRepository {
 	}
 }
 
-func (r *pageRepository) NextPageId() *domain.PageId {
-	panic("implement me")
+func (r *pageRepository) NextPageId() domain.PageId {
+	return 123
 }
 
 func (r *pageRepository) Add(post *domain.Comment) {
-	panic("implement me")
 }
 
 func (r *pageRepository) Delete(post *domain.Comment) {
-	panic("implement me")
 }
 
 func (r *pageRepository) FindByUrl(url string) *domain.Page {
-	panic("implement me")
+	return domain.NewPage(111, "https://hogefuga.com")
 }
