@@ -1,16 +1,12 @@
 package controller
 
 import (
-	"fmt"
-	"net/http"
-
 	"comment-api-on-gae/repository"
 	"comment-api-on-gae/usecase"
-	"encoding/json"
-	"google.golang.org/appengine"
+	"github.com/labstack/echo"
+	"net/http"
+	"time"
 )
-
-var count = 0
 
 type PageController struct{}
 
@@ -18,45 +14,62 @@ func NewPageController() *PageController {
 	return &PageController{}
 }
 
-func (c *PageController) List(w http.ResponseWriter, r *http.Request) {
-	var params struct {
-		PageUrl string
-	}
-
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&params)
-	if err != nil {
-		panic(err)
-	}
-
-	ctx := appengine.NewContext(r)
-	usecase.NewCommentUseCase(
-		repository.NewCommentRepository(ctx),
-		repository.NewPageRepository(ctx),
-		repository.NewCommenterRepository(ctx),
-	).GetComments(params.PageUrl)
-
+type commentsPresenter struct {
+	CommentId   int64     `json:"commentId"`
+	PageId      int64     `json:"pageId"`
+	Text        string    `json:"text"`
+	CommenterId int64     `json:"commenterId"`
+	CommentedAt time.Time `json:"commentedAt"`
 }
 
-func (c *PageController) Add(w http.ResponseWriter, r *http.Request) {
+func (ctl *PageController) List(c echo.Context) error {
 	var params struct {
-		PageUrl string
-		Text    string
-		Name    string
+		Url string
+	}
+	if err := c.Bind(&params); err != nil {
+		return err
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&params)
-	if err != nil {
-		panic(err)
+	ctx := c.StdContext()
+	comments := usecase.NewCommentUseCase(
+		repository.NewCommentRepository(ctx),
+		repository.NewPageRepository(ctx),
+		repository.NewCommenterRepository(ctx),
+	).GetComments(params.Url)
+
+	// TODO: 別集約を1つにまとめて返すための正しい方法
+	// TODO: Json用structの置き場所やネーミング
+	commentsJson := []*commentsPresenter{}
+	for _, cm := range comments {
+		commentsJson = append(commentsJson, &commentsPresenter{
+			CommentId:   int64(cm.CommentId()),
+			PageId:      int64(cm.PageId()),
+			Text:        cm.Text(),
+			CommenterId: int64(cm.CommenterId()),
+			CommentedAt: cm.CommentedAt(),
+		})
 	}
 
-	ctx := appengine.NewContext(r)
+	// TODO: レスポンスのデータ構造
+	return c.JSON(http.StatusOK, commentsJson)
+}
+
+func (ctl *PageController) PostComment(c echo.Context) error {
+	var params struct {
+		Url  string
+		Name string
+		Text string
+	}
+	if err := c.Bind(&params); err != nil {
+		return err
+	}
+
+	ctx := c.StdContext()
 	usecase.NewCommentUseCase(
 		repository.NewCommentRepository(ctx),
 		repository.NewPageRepository(ctx),
 		repository.NewCommenterRepository(ctx),
-	).PostComment(params.PageUrl, params.Name, params.Text)
+	).PostComment(params.Url, params.Name, params.Text)
 
-	fmt.Fprint(w, fmt.Sprintf("%s, %s", params.PageUrl, params.Text))
+	return c.JSON(http.StatusCreated, struct{}{})
 }

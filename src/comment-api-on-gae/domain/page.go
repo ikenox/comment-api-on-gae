@@ -2,13 +2,11 @@ package domain
 
 type PageId int64
 type Page struct {
-	Entity
 	pageId  PageId
 	pageUrl *PageUrl
 }
 
-func NewPage(pageId PageId, url string) *Page {
-	pageUrl := newPageUrl(url)
+func NewPage(pageId PageId, pageUrl *PageUrl) *Page {
 	return &Page{
 		pageId:  pageId,
 		pageUrl: pageUrl,
@@ -28,7 +26,11 @@ type PageUrl struct {
 	url string
 }
 
-func newPageUrl(url string) *PageUrl {
+func (p *PageUrl) Url() string {
+	return p.url
+}
+
+func NewPageUrl(url string) *PageUrl {
 	return &PageUrl{
 		url: url,
 	}

@@ -6,6 +6,12 @@ Commenting system run on GAE
 
 - docker-compose
 
+## Setup
+
+```shell
+$ docker-compose run --rm dep ensure
+```
+
 ## Run
 
 ```shell
