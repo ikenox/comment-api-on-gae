@@ -8,7 +8,6 @@ import (
 )
 
 type commenterRepository struct {
-	usecase.CommenterRepository
 	*dataStoreRepository
 }
 
@@ -32,18 +31,18 @@ func (r *commenterRepository) Add(commenter *domain.Commenter) {
 }
 
 func (r *commenterRepository) Delete(id domain.CommenterId) {
-	r.delete(r.newKey(int64(id)))
+	r.delete(r.newKey(int64(id), ""))
 }
 
 func (r *commenterRepository) Get(commenterId domain.CommenterId) *domain.Commenter {
 	var entity commenterEntity
-	key := r.newKey(int64(commenterId))
+	key := r.newKey(int64(commenterId), "")
 	r.get(key, &entity)
 	return r.build(key, &entity)
 }
 
 func (r *commenterRepository) toDataStoreEntity(commenter *domain.Commenter) (*datastore.Key, *commenterEntity) {
-	key := r.newKey(int64(commenter.CommenterId()))
+	key := r.newKey(int64(commenter.CommenterId()), "")
 	entity := &commenterEntity{
 		Name: commenter.Name(),
 	}

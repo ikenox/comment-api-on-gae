@@ -19,15 +19,23 @@ func NewCommentUseCase(commentRepository CommentRepository, pageRepository PageR
 	}
 }
 
-func (u *CommentUseCase) PostComment(url string, name string, text string) {
+func (u *CommentUseCase) PostComment(strPageId string, name string, text string) *Error {
+	pageId, err := domain.NewPageId(strPageId)
+	// TODO: 想定外のエラーへの対応
+	if err != nil {
+		return &Error{
+			domainError: err,
+			code:        EINVALID,
+		}
+	}
+
 	// get or create page
 	// TODO: 以下はsnippet化したくなりそう
 	// usecaseに関してはDRYじゃなくても弊害少ないか？
 	// コード的には重複していても概念的には別のケースを表すコードになる？
-	pageUrl := domain.NewPageUrl(url)
-	page := u.pageRepository.FindByUrl(pageUrl)
+	page := u.pageRepository.Get(pageId)
 	if page == nil {
-		page = domain.NewPage(u.pageRepository.NextPageId(), pageUrl)
+		page = domain.NewPage(u.pageRepository.NextPageId())
 	}
 	u.pageRepository.Add(page)
 
@@ -36,22 +44,33 @@ func (u *CommentUseCase) PostComment(url string, name string, text string) {
 
 	comment := commenter.NewComment(u.commentRepository.NextCommentId(), text, page, time.Now())
 	u.commentRepository.Add(comment)
+	return nil
 }
 
-func (u *CommentUseCase) GetComments(url string) []*domain.Comment {
-	page := u.pageRepository.FindByUrl(domain.NewPageUrl(url))
+func (u *CommentUseCase) GetComments(id string) ([]*domain.Comment, *Error) {
+	pageId, err := domain.NewPageId(id)
+	// TODO: 想定外のエラーへの対応
+	if err != nil {
+		return nil, &Error{
+			domainError: err,
+			code:        EINVALID,
+		}
+	}
+
+	page := u.pageRepository.Get(pageId)
 	if page == nil {
-		return []*domain.Comment{}
+		return nil, &Error{
+			code: ENOTFOUND,
+		}
 	}
 	comments := u.commentRepository.FindByPageId(page.PageId())
-	return comments
+	return comments, nil
 }
 
 type Repository interface {
 }
 
 type CommentRepository interface {
-	Repository
 	NextCommentId() domain.CommentId
 	Add(comment *domain.Comment)
 	Delete(comment domain.CommentId)
@@ -59,15 +78,13 @@ type CommentRepository interface {
 }
 
 type PageRepository interface {
-	Repository
 	NextPageId() domain.PageId
 	Add(page *domain.Page)
 	Delete(page domain.PageId)
-	FindByUrl(url *domain.PageUrl) *domain.Page
+	Get(pageId domain.PageId) *domain.Page
 }
 
 type CommenterRepository interface {
-	Repository
 	NextCommenterId() domain.CommenterId
 	Add(commenter *domain.Commenter)
 	Delete(commenterId domain.CommenterId)

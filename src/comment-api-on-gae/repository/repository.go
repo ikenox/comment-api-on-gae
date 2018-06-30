@@ -5,11 +5,7 @@ import (
 	"google.golang.org/appengine/datastore"
 )
 
-type repository struct {
-}
-
 type dataStoreRepository struct {
-	repository
 	ctx  context.Context
 	kind string
 }
@@ -30,9 +26,8 @@ func (r *dataStoreRepository) nextID() int64 {
 }
 
 // TODO: move to more concrete layer
-
-func (r *dataStoreRepository) newKey(id int64) *datastore.Key {
-	return datastore.NewKey(r.ctx, r.kind, "", id, nil)
+func (r *dataStoreRepository) newKey(intId int64, stringId string) *datastore.Key {
+	return datastore.NewKey(r.ctx, r.kind, stringId, intId, nil)
 }
 
 func (r *dataStoreRepository) delete(key *datastore.Key) {
@@ -50,9 +45,13 @@ func (r *dataStoreRepository) put(key *datastore.Key, src interface{}) *datastor
 	return key
 }
 
-func (r *dataStoreRepository) get(key *datastore.Key, src interface{}) {
+func (r *dataStoreRepository) get(key *datastore.Key, src interface{}) error {
 	err := datastore.Get(r.ctx, key, src)
-	if err != nil {
+	if err == nil {
+		return nil
+	} else if err == datastore.ErrNoSuchEntity {
+		return err
+	} else {
 		panic(err.Error())
 	}
 }

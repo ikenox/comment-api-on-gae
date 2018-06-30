@@ -3,39 +3,47 @@ package controller
 import (
 	"comment-api-on-gae/repository"
 	"comment-api-on-gae/usecase"
+	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 	"time"
 )
 
-type PageController struct{}
+type CommentController struct{}
 
-func NewPageController() *PageController {
-	return &PageController{}
+func NewCommentController() *CommentController {
+	return &CommentController{}
 }
 
 type commentsPresenter struct {
 	CommentId   int64     `json:"commentId"`
-	PageId      int64     `json:"pageId"`
+	PageId      string    `json:"pageId"`
 	Text        string    `json:"text"`
 	CommenterId int64     `json:"commenterId"`
 	CommentedAt time.Time `json:"commentedAt"`
 }
 
-func (ctl *PageController) List(c echo.Context) error {
+type applicationErrorPresenter struct {
+	Message string `json:"message"`
+}
+
+func (ctl *CommentController) List(c echo.Context) error {
 	var params struct {
-		Url string
+		PageId string
 	}
 	if err := c.Bind(&params); err != nil {
 		return err
 	}
 
 	ctx := c.StdContext()
-	comments := usecase.NewCommentUseCase(
+	comments, err := usecase.NewCommentUseCase(
 		repository.NewCommentRepository(ctx),
 		repository.NewPageRepository(ctx),
 		repository.NewCommenterRepository(ctx),
-	).GetComments(params.Url)
+	).GetComments(params.PageId)
+	if err != nil {
+		return renderErrorJSON(c, err)
+	}
 
 	// TODO: 別集約を1つにまとめて返すための正しい方法
 	// TODO: Json用structの置き場所やネーミング
@@ -43,7 +51,7 @@ func (ctl *PageController) List(c echo.Context) error {
 	for _, cm := range comments {
 		commentsJson = append(commentsJson, &commentsPresenter{
 			CommentId:   int64(cm.CommentId()),
-			PageId:      int64(cm.PageId()),
+			PageId:      string(cm.PageId()),
 			Text:        cm.Text(),
 			CommenterId: int64(cm.CommenterId()),
 			CommentedAt: cm.CommentedAt(),
@@ -54,22 +62,46 @@ func (ctl *PageController) List(c echo.Context) error {
 	return c.JSON(http.StatusOK, commentsJson)
 }
 
-func (ctl *PageController) PostComment(c echo.Context) error {
+func (ctl *CommentController) PostComment(c echo.Context) error {
 	var params struct {
-		Url  string
-		Name string
-		Text string
+		PageId string
+		Name   string
+		Text   string
 	}
 	if err := c.Bind(&params); err != nil {
 		return err
 	}
 
 	ctx := c.StdContext()
-	usecase.NewCommentUseCase(
+	err := usecase.NewCommentUseCase(
 		repository.NewCommentRepository(ctx),
 		repository.NewPageRepository(ctx),
 		repository.NewCommenterRepository(ctx),
-	).PostComment(params.Url, params.Name, params.Text)
+	).PostComment(params.PageId, params.Name, params.Text)
+	if err != nil {
+		return renderErrorJSON(c, err)
+	}
 
 	return c.JSON(http.StatusCreated, struct{}{})
+}
+
+func renderErrorJSON(c echo.Context, err *usecase.Error) error {
+	var status int
+	switch err.Code() {
+	case usecase.EINVALID:
+		status = http.StatusBadRequest
+	case usecase.EINTERNAL:
+		status = http.StatusInternalServerError
+	case usecase.ENOTFOUND:
+		status = http.StatusNotFound
+	default:
+		panic(fmt.Sprintf("Unknown Error Code '%s'", err.Code()))
+	}
+
+	return c.JSON(
+		status,
+		&applicationErrorPresenter{
+			Message: err.Message(),
+		},
+	)
 }

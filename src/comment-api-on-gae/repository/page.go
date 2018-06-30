@@ -8,7 +8,6 @@ import (
 )
 
 type pageRepository struct {
-	usecase.PageRepository
 	*dataStoreRepository
 }
 
@@ -28,21 +27,19 @@ func (r *pageRepository) Add(page *domain.Page) {
 }
 
 func (r *pageRepository) Delete(id domain.PageId) {
-	r.delete(r.newKey(int64(id)))
+	r.delete(r.newKey(0, string(id)))
 }
 
-func (r *pageRepository) FindByUrl(pageUrl *domain.PageUrl) *domain.Page {
-	return nil
+func (r *pageRepository) Get(id domain.PageId) *domain.Page {
+	entity := &pageEntity{}
+	r.get(r.newKey(0, string(id)), entity)
+	return domain.NewPage(id)
 }
 
-type pageEntity struct {
-	PageUrl string
-}
+type pageEntity struct{}
 
 func (r *pageRepository) toDataStoreEntity(page *domain.Page) (*datastore.Key, *pageEntity) {
-	key := r.newKey(int64(page.PageId()))
-	entity := &pageEntity{
-		PageUrl: page.PageUrl().Url(),
-	}
+	key := r.newKey(0, string(page.PageId()))
+	entity := &pageEntity{}
 	return key, entity
 }
