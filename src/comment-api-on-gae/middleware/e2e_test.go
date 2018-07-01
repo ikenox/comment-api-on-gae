@@ -1,4 +1,4 @@
-package e2e
+package middleware_test
 
 import (
 	"comment-api-on-gae/middleware"
