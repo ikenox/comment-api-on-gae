@@ -32,7 +32,11 @@ func (r *pageRepository) Delete(id domain.PageId) {
 
 func (r *pageRepository) Get(id domain.PageId) *domain.Page {
 	entity := &pageEntity{}
-	r.get(r.newKey(0, string(id)), entity)
+	err := r.get(r.newKey(0, string(id)), entity)
+	// TODO: ここまでdatastoreのerr引き回してくるのはあんまりきれいじゃない？
+	if err == datastore.ErrNoSuchEntity {
+		return nil
+	}
 	return domain.NewPage(id)
 }
 

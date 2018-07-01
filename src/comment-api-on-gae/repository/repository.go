@@ -30,6 +30,7 @@ func (r *dataStoreRepository) newKey(intId int64, stringId string) *datastore.Ke
 	return datastore.NewKey(r.ctx, r.kind, stringId, intId, nil)
 }
 
+// TODO: panicしてしまってるのでリトライなど不可
 func (r *dataStoreRepository) delete(key *datastore.Key) {
 	err := datastore.Delete(r.ctx, key)
 	if err != nil {

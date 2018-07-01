@@ -67,9 +67,6 @@ func (u *CommentUseCase) GetComments(id string) ([]*domain.Comment, *Error) {
 	return comments, nil
 }
 
-type Repository interface {
-}
-
 type CommentRepository interface {
 	NextCommentId() domain.CommentId
 	Add(comment *domain.Comment)
