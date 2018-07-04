@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestComment(t *testing.T) {
+func TestCommentAndView(t *testing.T) {
 	s, done := newTestServerClient(t)
 	defer done()
 

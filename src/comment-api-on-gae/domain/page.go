@@ -6,10 +6,6 @@ import (
 
 type PageId string
 
-var (
-	InvalidPageIdError = Error{message: "invalid page id"}
-)
-
 func NewPageId(pageId string) PageId {
 	if !IsValidPageId(pageId) {
 		panic("Invalid pageId")

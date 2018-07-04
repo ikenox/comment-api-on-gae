@@ -2,27 +2,29 @@ package usecase
 
 type Code string
 
+// UseCaseの処理結果全部ここ
+// 成功も失敗も本質的には変わらないのでは？
+// TODO 考察: 処理は失敗したけどなんらかのデータを返したい場合ってある？返さないほうがいい？
+// 実質http status codeと1対多の関係？
+// 結果を抽象化しておくことでcontrollerではhttp status code以外への変換にも対応できる
 const (
-	EINVALID  Code = "invalid"   // validation failed
-	ENOTFOUND Code = "not found" // validation failed
-	EINTERNAL Code = "internal"  // unknown error
+	OK          Code = "ok"         // success
+	CREATED     Code = "created"    //
+	EINVALID    Code = "invalid"    // validation failed
+	ENOTFOUND   Code = "not found"  // validation failed
+	EUNEXPECTED Code = "unexpected" // unknown error
 )
 
-// レイヤごとにエラー型を別に定義している
-// - 想定外のエラーがレイヤ超えて飛んでくることがなくなる
-// - 役割が異なる。ひとつのドメインエラーに対してユーザーには複数の伝え方（アプリケーションエラー）があるかも
-// - 何が起きたかはユーザーには詳細を伝えたくない場合もあるかもしれない
-//   - ドメインエラー: 純粋に何が起きたかを厳密に表現
-//   - アプリケーションエラー: ユーザーへの伝え方を表現
-type Error struct {
+type Result struct {
+	data    interface{}
 	message string
 	code    Code
 }
 
-func (e *Error) Code() Code {
+func (e *Result) Code() Code {
 	return e.code
 }
 
-func (e *Error) Message() string {
+func (e *Result) Message() string {
 	return e.message
 }

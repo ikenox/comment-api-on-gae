@@ -5,6 +5,7 @@ import (
 	"google.golang.org/appengine/datastore"
 )
 
+// TODO: ここらへんリファクタ
 type dataStoreRepository struct {
 	ctx  context.Context
 	kind string

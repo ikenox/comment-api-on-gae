@@ -5,24 +5,19 @@ import (
 	"time"
 )
 
+// UseCaseとかRepositoryはコンストラクタいらない？？
+// まぁ必要になったら生やす
 type CommentUseCase struct {
 	commentRepository   CommentRepository
 	commenterRepository CommenterRepository
 	pageRepository      PageRepository
 }
 
-func NewCommentUseCase(commentRepository CommentRepository, pageRepository PageRepository, commenterRepository CommenterRepository) *CommentUseCase {
-	return &CommentUseCase{
-		commentRepository:   commentRepository,
-		commenterRepository: commenterRepository,
-		pageRepository:      pageRepository,
-	}
-}
-
-func (u *CommentUseCase) PostComment(strPageId string, name string, text string) *Error {
+func (u *CommentUseCase) PostComment(strPageId string, name string, text string) *Result {
 	// ドメイン層でPageIdのバリデーションエラーハンドリングしようとするといたるところにエラーハンドリングが散らばるのでやめた方良さそう
 	// この例だと、NewPageIdがエラー返しちゃうとstring => PageIdの変換をするいたるところにエラーハンドリングのボイラープレートロジックが書かれる
 	// ドメインのどこかで発生してたらい回しにされまくって返ってきたエラーをcaseに分けてハンドリングするの辛い
+	// failure is your domainでは再帰的にエラーメッセージ探索してるけど、ドメイン層で発生したエラーのエラーメッセージってほんとにユーザーに見せていいの？
 	// なるべく外側のレイヤ(アプリケーション層)でバリデーションする前提でドメインロジック書いたほうがドメインがスッキリしそう
 	// 内側のレイヤなほどerror投げたときにそれをキャッチする処理かかなくてはいけなくなる箇所が増える
 	// そもそもエラーはドメインの概念じゃない？
@@ -31,7 +26,7 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	// アプリケーション層以下では不純物混ざらないという前提で書けるので全体的に記述量減るしシンプルになる気がした
 	// ドメインにIsValidXXといったメソッド増えまくりそうなのはちょっとあれかも。static method欲しくなる。。
 	if !domain.IsValidPageId(strPageId) {
-		return &Error{
+		return &Result{
 			message: "PageId is invalid",
 			code:    EINVALID,
 		}
@@ -55,9 +50,9 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	return nil
 }
 
-func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, *Error) {
+func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, *Result) {
 	if !domain.IsValidPageId(strPageId) {
-		return nil, &Error{
+		return nil, &Result{
 			message: "PageId is invalid",
 			code:    EINVALID,
 		}
@@ -66,32 +61,11 @@ func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, *Erro
 
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
-		return nil, &Error{
+		return nil, &Result{
 			message: "Page is not found",
 			code:    ENOTFOUND,
 		}
 	}
 	comments := u.commentRepository.FindByPageId(page.PageId())
 	return comments, nil
-}
-
-type CommentRepository interface {
-	NextCommentId() domain.CommentId
-	Add(comment *domain.Comment)
-	Delete(comment domain.CommentId)
-	FindByPageId(page domain.PageId) []*domain.Comment
-}
-
-type PageRepository interface {
-	NextPageId() domain.PageId
-	Add(page *domain.Page)
-	Delete(page domain.PageId)
-	Get(pageId domain.PageId) *domain.Page
-}
-
-type CommenterRepository interface {
-	NextCommenterId() domain.CommenterId
-	Add(commenter *domain.Commenter)
-	Delete(commenterId domain.CommenterId)
-	Get(commenterId domain.CommenterId) *domain.Commenter
 }

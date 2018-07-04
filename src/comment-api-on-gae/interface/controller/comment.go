@@ -87,7 +87,7 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 	return c.JSON(http.StatusCreated, struct{}{})
 }
 
-func renderErrorJSON(c echo.Context, err *usecase.Error) error {
+func renderErrorJSON(c echo.Context, err *usecase.Result) error {
 	var status int
 	switch err.Code() {
 	case usecase.EINVALID:
@@ -97,7 +97,7 @@ func renderErrorJSON(c echo.Context, err *usecase.Error) error {
 	case usecase.ENOTFOUND:
 		status = http.StatusNotFound
 	default:
-		panic(fmt.Sprintf("Unknown Error Code '%s'", err.Code()))
+		panic(fmt.Sprintf("Unknown Result Code '%s'", err.Code()))
 	}
 
 	return c.JSON(
