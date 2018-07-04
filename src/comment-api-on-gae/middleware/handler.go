@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"comment-api-on-gae/controller"
+	"comment-api-on-gae/interface/controller"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
 	"github.com/labstack/echo/middleware"

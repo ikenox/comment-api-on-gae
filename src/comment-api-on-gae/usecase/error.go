@@ -1,13 +1,11 @@
 package usecase
 
-import "comment-api-on-gae/domain"
-
 type Code string
 
 const (
 	EINVALID  Code = "invalid"   // validation failed
 	ENOTFOUND Code = "not found" // validation failed
-	EINTERNAL Code = "internal"  // validation failed
+	EINTERNAL Code = "internal"  // unknown error
 )
 
 // レイヤごとにエラー型を別に定義している
@@ -17,12 +15,8 @@ const (
 //   - ドメインエラー: 純粋に何が起きたかを厳密に表現
 //   - アプリケーションエラー: ユーザーへの伝え方を表現
 type Error struct {
-	domainError *domain.Error
-	code        Code
-}
-
-func (e *Error) DomainError() *domain.Error {
-	return e.domainError
+	message string
+	code    Code
 }
 
 func (e *Error) Code() Code {
@@ -30,5 +24,5 @@ func (e *Error) Code() Code {
 }
 
 func (e *Error) Message() string {
-	return e.domainError.Message()
+	return e.message
 }

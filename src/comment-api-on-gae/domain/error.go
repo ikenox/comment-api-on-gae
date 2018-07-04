@@ -2,9 +2,15 @@ package domain
 
 type Error struct {
 	message string
-	err     *Error
+	error   *Error
 }
 
-func (e *Error) Message() string {
-	return e.message
+func (e *Error) Error() string {
+	if e.message != "" {
+		return e.message
+	} else if e.error != nil {
+		return e.Error()
+	} else {
+		return ""
+	}
 }

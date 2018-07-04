@@ -59,6 +59,8 @@ func (ctl *CommentController) List(c echo.Context) error {
 	}
 
 	// TODO: レスポンスのデータ構造
+	// NOTE: status codeが何になるかをcontrollerが知っているのが変かも
+	// 厳密にはアプリケーション層からresultcode的なものが来るべきか
 	return c.JSON(http.StatusOK, commentsJson)
 }
 
@@ -101,7 +103,7 @@ func renderErrorJSON(c echo.Context, err *usecase.Error) error {
 	return c.JSON(
 		status,
 		&applicationErrorPresenter{
-			Message: err.Message(),
+			Message: err.Error(),
 		},
 	)
 }

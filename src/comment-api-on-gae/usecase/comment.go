@@ -20,19 +20,27 @@ func NewCommentUseCase(commentRepository CommentRepository, pageRepository PageR
 }
 
 func (u *CommentUseCase) PostComment(strPageId string, name string, text string) *Error {
-	pageId, err := domain.NewPageId(strPageId)
-	// TODO: 想定外のエラーへの対応
-	if err != nil {
+	// ドメイン層でPageIdのバリデーションエラーハンドリングしようとするといたるところにエラーハンドリングが散らばるのでやめた方良さそう
+	// この例だと、NewPageIdがエラー返しちゃうとstring => PageIdの変換をするいたるところにエラーハンドリングのボイラープレートロジックが書かれる
+	// ドメインのどこかで発生してたらい回しにされまくって返ってきたエラーをcaseに分けてハンドリングするの辛い
+	// なるべく外側のレイヤ(アプリケーション層)でバリデーションする前提でドメインロジック書いたほうがドメインがスッキリしそう
+	// 内側のレイヤなほどerror投げたときにそれをキャッチする処理かかなくてはいけなくなる箇所が増える
+	// そもそもエラーはドメインの概念じゃない？
+	// 実行時エラー返すんじゃなくて、「何が正常か」を明示的に表現している(メソッドが生えている)方がドメインモデルのあり方としては正しい気がする
+	// ドメイン層は純粋なものしか扱わないようにする、不純物混ざりそうになった瞬間に即panicする方針
+	// アプリケーション層以下では不純物混ざらないという前提で書けるので全体的に記述量減るしシンプルになる気がした
+	// ドメインにIsValidXXといったメソッド増えまくりそうなのはちょっとあれかも。static method欲しくなる。。
+	if !domain.IsValidPageId(strPageId) {
 		return &Error{
-			domainError: err,
-			code:        EINVALID,
+			message: "PageId is invalid",
+			code:    EINVALID,
 		}
 	}
+	pageId := domain.NewPageId(strPageId)
 
-	// get or create page
 	// TODO: 以下はsnippet化したくなりそう
-	// usecaseに関してはDRYじゃなくても弊害少ないか？
-	// コード的には重複していても概念的には別のケースを表すコードになる？
+	// usecaseに関してはDRYじゃなくても弊害少ない？
+	// Get or Create Page
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
 		page = domain.NewPage(u.pageRepository.NextPageId())
@@ -47,20 +55,20 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	return nil
 }
 
-func (u *CommentUseCase) GetComments(id string) ([]*domain.Comment, *Error) {
-	pageId, err := domain.NewPageId(id)
-	// TODO: 想定外のエラーへの対応
-	if err != nil {
+func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, *Error) {
+	if !domain.IsValidPageId(strPageId) {
 		return nil, &Error{
-			domainError: err,
-			code:        EINVALID,
+			message: "PageId is invalid",
+			code:    EINVALID,
 		}
 	}
+	pageId := domain.NewPageId(strPageId)
 
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
 		return nil, &Error{
-			code: ENOTFOUND,
+			message: "Page is not found",
+			code:    ENOTFOUND,
 		}
 	}
 	comments := u.commentRepository.FindByPageId(page.PageId())

@@ -6,19 +6,20 @@ import (
 
 type PageId string
 
-type InvalidPageIdError Error
+var (
+	InvalidPageIdError = Error{message: "invalid page id"}
+)
 
-func NewPageId(pageId string) (PageId, *Error) {
-	if !isValidPageId(pageId) {
-		err := Error(InvalidPageIdError{message: "invalid PageId"})
-		return "", &err
+func NewPageId(pageId string) PageId {
+	if !IsValidPageId(pageId) {
+		panic("Invalid pageId")
 	}
-	return PageId(pageId), nil
+	return PageId(pageId)
 }
 
 var pageIdRegexp = regexp.MustCompile("^[0-9a-zA-Z_\\-]+$")
 
-func isValidPageId(pageId string) bool {
+func IsValidPageId(pageId string) bool {
 	re := pageIdRegexp.Copy()
 	pageId = re.FindString(pageId)
 	return pageId != ""
