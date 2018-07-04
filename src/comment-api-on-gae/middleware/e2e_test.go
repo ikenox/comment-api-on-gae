@@ -19,7 +19,7 @@ func TestCommentAndView(t *testing.T) {
 		Name   string
 		Text   string
 	}{
-		"Valid-page_id",
+		"pageId1",
 		"commenter1",
 		"text",
 	})
@@ -27,7 +27,7 @@ func TestCommentAndView(t *testing.T) {
 		t.Errorf("got %v\nwant %v", rec.Code, http.StatusCreated)
 	}
 
-	rec = s.Request("GET", "/comment", nil)
+	rec = s.Request("GET", "/comment?PageId=pageId1", nil)
 	if rec.Code != http.StatusOK {
 		t.Errorf("got %v\nwant %v", rec.Code, http.StatusOK)
 	}

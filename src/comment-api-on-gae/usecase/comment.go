@@ -13,7 +13,7 @@ type CommentUseCase struct {
 	pageRepository      PageRepository
 }
 
-func (u *CommentUseCase) PostComment(strPageId string, name string, text string) *Result {
+func (u *CommentUseCase) PostComment(strPageId string, name string, text string) (*domain.Comment, *domain.Commenter, *Result) {
 	// ドメイン層でPageIdのバリデーションエラーハンドリングしようとするといたるところにエラーハンドリングが散らばるのでやめた方良さそう
 	// この例だと、NewPageIdがエラー返しちゃうとstring => PageIdの変換をするいたるところにエラーハンドリングのボイラープレートロジックが書かれる
 	// ドメインのどこかで発生してたらい回しにされまくって返ってきたエラーをcaseに分けてハンドリングするの辛い
@@ -26,9 +26,9 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	// アプリケーション層以下では不純物混ざらないという前提で書けるので全体的に記述量減るしシンプルになる気がした
 	// ドメインにIsValidXXといったメソッド増えまくりそうなのはちょっとあれかも。static method欲しくなる。。
 	if !domain.IsValidPageId(strPageId) {
-		return &Result{
-			message: "PageId is invalid",
+		return nil, nil, &Result{
 			code:    EINVALID,
+			message: "PageId is invalid",
 		}
 	}
 	pageId := domain.NewPageId(strPageId)
@@ -47,12 +47,14 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 
 	comment := commenter.NewComment(u.commentRepository.NextCommentId(), text, page, time.Now())
 	u.commentRepository.Add(comment)
-	return nil
+	return comment, commenter, &Result{OK}
 }
 
 func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, *Result) {
 	if !domain.IsValidPageId(strPageId) {
 		return nil, &Result{
+			// messageがDRYじゃないけどそんなに弊害無いと判断、messageの時点でそもそも統一性持たせなくていい前提
+			// 統一性もたせる(DRYにする)必要があるならcodeをそのレベルまで細分化すべき
 			message: "PageId is invalid",
 			code:    EINVALID,
 		}
