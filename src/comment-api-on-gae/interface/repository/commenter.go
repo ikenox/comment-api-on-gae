@@ -35,10 +35,28 @@ func (r *commenterRepository) Delete(id domain.CommenterId) {
 }
 
 func (r *commenterRepository) Get(commenterId domain.CommenterId) *domain.Commenter {
-	var entity commenterEntity
+	entity := new(commenterEntity)
 	key := r.newKey(int64(commenterId), "")
-	r.get(key, &entity)
-	return r.build(key, &entity)
+	ok := r.get(key, entity)
+	if !ok {
+		return nil
+	}
+	return r.build(key, entity)
+}
+
+func (r *commenterRepository) FindByComments(commenterIds []domain.CommenterId) []*domain.Commenter {
+	entities := make([]*commenterEntity, len(commenterIds))
+	keys := make([]*datastore.Key, len(commenterIds))
+	for i, id := range commenterIds {
+		keys[i] = r.newKey(int64(id), "")
+	}
+	r.getMulti(keys, entities)
+
+	commenters := make([]*domain.Commenter, len(commenterIds))
+	for i, keys := range keys {
+		commenters[i] = domain.NewCommenter(domain.CommenterId(keys.IntID()), entities[i].Name)
+	}
+	return commenters
 }
 
 func (r *commenterRepository) toDataStoreEntity(commenter *domain.Commenter) (*datastore.Key, *commenterEntity) {

@@ -31,19 +31,25 @@ func (r *pageRepository) Delete(id domain.PageId) {
 }
 
 func (r *pageRepository) Get(id domain.PageId) *domain.Page {
-	entity := &pageEntity{}
-	err := r.get(r.newKey(0, string(id)), entity)
-	// TODO: ここまでdatastoreのerr引き回してくるのはあんまりきれいじゃない？
-	if err == datastore.ErrNoSuchEntity {
+	entity := new(pageEntity)
+	key := r.newKey(0, string(id))
+	ok := r.get(key, entity)
+	if !ok {
 		return nil
 	}
-	return domain.NewPage(id)
+	return r.build(key, entity)
 }
 
 type pageEntity struct{}
 
+// TODO: repositoryが持ってんのなんか変
+// presetnerに寄ってるのが正しい姿？
 func (r *pageRepository) toDataStoreEntity(page *domain.Page) (*datastore.Key, *pageEntity) {
 	key := r.newKey(0, string(page.PageId()))
 	entity := &pageEntity{}
 	return key, entity
+}
+
+func (r *pageRepository) build(key *datastore.Key, entity *pageEntity) *domain.Page {
+	return domain.NewPage(domain.PageId(key.StringID()))
 }

@@ -2,7 +2,7 @@ package domain
 
 import "time"
 
-type CommentId int
+type CommentId int64
 type Comment struct {
 	commentId   CommentId
 	pageId      PageId

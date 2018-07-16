@@ -1,12 +1,10 @@
 package controller
 
 import (
-	"comment-api-on-gae/repository"
+	"comment-api-on-gae/interface/presenter"
+	"comment-api-on-gae/interface/repository"
 	"comment-api-on-gae/usecase"
-	"fmt"
 	"github.com/labstack/echo"
-	"net/http"
-	"time"
 )
 
 type CommentController struct{}
@@ -15,53 +13,42 @@ func NewCommentController() *CommentController {
 	return &CommentController{}
 }
 
-type commentsPresenter struct {
-	CommentId   int64     `json:"commentId"`
-	PageId      string    `json:"pageId"`
-	Text        string    `json:"text"`
-	CommenterId int64     `json:"commenterId"`
-	CommentedAt time.Time `json:"commentedAt"`
-}
-
-type applicationErrorPresenter struct {
-	Message string `json:"message"`
-}
-
+// adapter層なのでガード節などの変換関係ないビジネスロジックは基本入らなくなる？
 func (ctl *CommentController) List(c echo.Context) error {
 	var params struct {
 		PageId string
 	}
+	// 変換失敗時点でreturn
+	// アプリケーションエラーとは別？
+	// アプリケーションエラーはプロトコル守っている前提で発生したエラー
+	// この場合は指定のプロトコル守ってないので変換エラー
 	if err := c.Bind(&params); err != nil {
 		return err
 	}
 
 	ctx := c.StdContext()
-	comments, err := usecase.NewCommentUseCase(
+	u := usecase.NewCommentUseCase(
 		repository.NewCommentRepository(ctx),
-		repository.NewPageRepository(ctx),
 		repository.NewCommenterRepository(ctx),
-	).GetComments(params.PageId)
-	if err != nil {
-		return renderErrorJSON(c, err)
-	}
+		repository.NewPageRepository(ctx),
+	)
+	comments, commenters, res := u.GetComments(params.PageId)
 
 	// TODO: 別集約を1つにまとめて返すための正しい方法
 	// TODO: Json用structの置き場所やネーミング
-	commentsJson := []*commentsPresenter{}
-	for _, cm := range comments {
-		commentsJson = append(commentsJson, &commentsPresenter{
-			CommentId:   int64(cm.CommentId()),
-			PageId:      string(cm.PageId()),
-			Text:        cm.Text(),
-			CommenterId: int64(cm.CommenterId()),
-			CommentedAt: cm.CommentedAt(),
-		})
+	var json []interface{}
+	if len(comments) > 0 {
+		json = make([]interface{}, len(comments))
+		p := &presenter.CommentPresenter{}
+		for i := 0; i < len(comments); i++ {
+			if commenters[i] != nil && comments[i] != nil {
+				json[i] = p.Render(comments[i], commenters[i])
+			}
+		}
 	}
 
 	// TODO: レスポンスのデータ構造
-	// NOTE: status codeが何になるかをcontrollerが知っているのが変かも
-	// 厳密にはアプリケーション層からresultcode的なものが来るべきか
-	return c.JSON(http.StatusOK, commentsJson)
+	return renderJSON(c, json, res)
 }
 
 func (ctl *CommentController) PostComment(c echo.Context) error {
@@ -75,35 +62,17 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 	}
 
 	ctx := c.StdContext()
-	err := usecase.NewCommentUseCase(
+	u := usecase.NewCommentUseCase(
 		repository.NewCommentRepository(ctx),
-		repository.NewPageRepository(ctx),
 		repository.NewCommenterRepository(ctx),
-	).PostComment(params.PageId, params.Name, params.Text)
-	if err != nil {
-		return renderErrorJSON(c, err)
-	}
-
-	return c.JSON(http.StatusCreated, struct{}{})
-}
-
-func renderErrorJSON(c echo.Context, err *usecase.Result) error {
-	var status int
-	switch err.Code() {
-	case usecase.EINVALID:
-		status = http.StatusBadRequest
-	case usecase.EINTERNAL:
-		status = http.StatusInternalServerError
-	case usecase.ENOTFOUND:
-		status = http.StatusNotFound
-	default:
-		panic(fmt.Sprintf("Unknown Result Code '%s'", err.Code()))
-	}
-
-	return c.JSON(
-		status,
-		&applicationErrorPresenter{
-			Message: err.Error(),
-		},
+		repository.NewPageRepository(ctx),
 	)
+	comment, commenter, result := u.PostComment(params.PageId, params.Name, params.Text)
+
+	var json interface{}
+	if comment != nil && commenter != nil {
+		p := &presenter.CommentPresenter{}
+		json = p.Render(comment, commenter)
+	}
+	return renderJSON(c, json, result)
 }

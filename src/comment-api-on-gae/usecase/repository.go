@@ -18,6 +18,7 @@ type PageRepository interface {
 
 type CommenterRepository interface {
 	NextCommenterId() domain.CommenterId
+	FindByComments(commenterIds []domain.CommenterId) []*domain.Commenter
 	Add(commenter *domain.Commenter)
 	Delete(commenterId domain.CommenterId)
 	Get(commenterId domain.CommenterId) *domain.Commenter

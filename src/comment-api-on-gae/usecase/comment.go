@@ -5,14 +5,26 @@ import (
 	"time"
 )
 
-// UseCaseとかRepositoryはコンストラクタいらない？？
-// まぁ必要になったら生やす
 type CommentUseCase struct {
 	commentRepository   CommentRepository
 	commenterRepository CommenterRepository
 	pageRepository      PageRepository
 }
 
+// あんまりいらない気もするけどデメリットもない気がするのでとりあえず作っている
+func NewCommentUseCase(
+	commentRepo CommentRepository,
+	commenterRepo CommenterRepository,
+	pageRepo PageRepository,
+) *CommentUseCase {
+	return &CommentUseCase{
+		commentRepository:   commentRepo,
+		commenterRepository: commenterRepo,
+		pageRepository:      pageRepo,
+	}
+}
+
+// デメリットあんまり無さそうなのでコマンドとクエリの責務分離してない
 func (u *CommentUseCase) PostComment(strPageId string, name string, text string) (*domain.Comment, *domain.Commenter, *Result) {
 	// ドメイン層でPageIdのバリデーションエラーハンドリングしようとするといたるところにエラーハンドリングが散らばるのでやめた方良さそう
 	// この例だと、NewPageIdがエラー返しちゃうとstring => PageIdの変換をするいたるところにエラーハンドリングのボイラープレートロジックが書かれる
@@ -27,7 +39,7 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	// ドメインにIsValidXXといったメソッド増えまくりそうなのはちょっとあれかも。static method欲しくなる。。
 	if !domain.IsValidPageId(strPageId) {
 		return nil, nil, &Result{
-			code:    EINVALID,
+			code:    E_INVALID,
 			message: "PageId is invalid",
 		}
 	}
@@ -35,7 +47,6 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 
 	// TODO: 以下はsnippet化したくなりそう
 	// usecaseに関してはDRYじゃなくても弊害少ない？
-	// Get or Create Page
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
 		page = domain.NewPage(u.pageRepository.NextPageId())
@@ -47,27 +58,40 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 
 	comment := commenter.NewComment(u.commentRepository.NextCommentId(), text, page, time.Now())
 	u.commentRepository.Add(comment)
-	return comment, commenter, &Result{OK}
+
+	// TODO: もうちょっとかっこよく返したい
+	// comment, commenterはどちらも存在するor存在しないというのをコードで表明できていない
+	return comment, commenter, &Result{code: OK}
 }
 
-func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, *Result) {
+func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, []*domain.Commenter, *Result) {
 	if !domain.IsValidPageId(strPageId) {
-		return nil, &Result{
+		return nil, nil, &Result{
 			// messageがDRYじゃないけどそんなに弊害無いと判断、messageの時点でそもそも統一性持たせなくていい前提
-			// 統一性もたせる(DRYにする)必要があるならcodeをそのレベルまで細分化すべき
+			// 統一性もたせる必要があるならcodeをそのレベルまで細分化すべき
 			message: "PageId is invalid",
-			code:    EINVALID,
+			code:    E_INVALID,
 		}
 	}
 	pageId := domain.NewPageId(strPageId)
 
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
-		return nil, &Result{
+		return nil, nil, &Result{
 			message: "Page is not found",
-			code:    ENOTFOUND,
+			code:    E_NOTFOUND,
 		}
 	}
+
 	comments := u.commentRepository.FindByPageId(page.PageId())
-	return comments, nil
+
+	commentIds := make([]domain.CommenterId, len(comments))
+	for i, c := range comments {
+		commentIds[i] = c.CommenterId()
+	}
+	commenters := u.commenterRepository.FindByComments(commentIds)
+
+	// TODO: もうちょっとかっこよく返したい
+	// comment, commenterはどちらも存在するor存在しないというのをコードで表明できていない
+	return comments, commenters, &Result{code: OK}
 }
