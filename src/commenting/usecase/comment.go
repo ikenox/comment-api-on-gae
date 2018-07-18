@@ -2,7 +2,9 @@ package usecase
 
 import (
 	"commenting/domain"
+	"fmt"
 	"time"
+	"unicode/utf8"
 )
 
 type CommentUseCase struct {
@@ -11,7 +13,7 @@ type CommentUseCase struct {
 	pageRepository      PageRepository
 }
 
-// あんまりいらない気もするけどデメリットもない気がするのでとりあえず作っている
+// あんまりいらない気もする
 func NewCommentUseCase(
 	commentRepo CommentRepository,
 	commenterRepo CommenterRepository,
@@ -37,16 +39,23 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	// ドメイン層は純粋なものしか扱わないようにする、不純物混ざりそうになった瞬間に即panicする方針
 	// アプリケーション層以下では不純物混ざらないという前提で書けるので全体的に記述量減るしシンプルになる気がした
 	// ドメインにIsValidXXといったメソッド増えまくりそうなのはちょっとあれかも。static method欲しくなる。。
-	if !domain.IsValidPageId(strPageId) {
-		return &Result{
-			code:    E_INVALID,
-			message: "PageId is invalid",
-		}
+	if err := domain.PageIdSpec.CheckValidityOf(strPageId); err != nil {
+		return &Result{ErrInvalid, fmt.Sprintf("PageId is invalid: %s", err.Error())}
 	}
-	pageId := domain.NewPageId(strPageId)
 
-	// TODO: 以下はsnippet化したくなりそう
-	// usecaseに関してはDRYじゃなくても弊害少ない？
+	if nameLen := utf8.RuneCountInString(name); nameLen > 20 {
+		return &Result{ErrInvalid, "Name is too long."}
+	}
+
+	// TODO: ここらへんドメインで定義されるべきか
+	if text == "" {
+		return &Result{ErrInvalid, "Comment is too long."}
+	}
+	if commentLen := utf8.RuneCountInString(text); commentLen > 1000 {
+		return &Result{ErrInvalid, "Comment is too long."}
+	}
+
+	pageId := domain.NewPageId(strPageId)
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
 		page = domain.NewPage(pageId)
@@ -63,12 +72,12 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 }
 
 func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, []*domain.Commenter, *Result) {
-	if !domain.IsValidPageId(strPageId) {
+	if err := domain.PageIdSpec.CheckValidityOf(strPageId); err != nil {
+		// messageがDRYじゃないけどそんなに弊害無いと判断、messageの時点でそもそも統一性持たせなくていい前提
+		// 統一性もたせる必要があるならcodeをそのレベルまで細分化すべき
 		return nil, nil, &Result{
-			// messageがDRYじゃないけどそんなに弊害無いと判断、messageの時点でそもそも統一性持たせなくていい前提
-			// 統一性もたせる必要があるならcodeをそのレベルまで細分化すべき
-			message: "PageId is invalid",
-			code:    E_INVALID,
+			ErrInvalid,
+			fmt.Sprintf("PageId is invalid: %s", err.Error()),
 		}
 	}
 	pageId := domain.NewPageId(strPageId)

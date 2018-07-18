@@ -21,10 +21,10 @@ type Code string
 //     INVALID
 //       PAGEID
 const (
-	OK          Code = "ok"         // success
-	E_INVALID   Code = "invalid"    // validation failed
-	E_NOTFOUND  Code = "not found"  // validation failed
-	E_NEXPECTED Code = "unexpected" // unknown error
+	OK            Code = "ok"         // success
+	ErrInvalid    Code = "invalid"    // validation failed
+	ErrNotFound   Code = "not found"  // resource not found
+	ErrUnexpected Code = "unexpected" // unknown error
 )
 
 // データの入れ物でしかないのでコンストラクタ不要と判断

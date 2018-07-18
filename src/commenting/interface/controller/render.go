@@ -13,11 +13,11 @@ func renderJSON(c echo.Context, json interface{}, result *usecase.Result) error 
 	switch result.Code() {
 	case usecase.OK:
 		status = http.StatusOK
-	case usecase.E_INVALID:
+	case usecase.ErrInvalid:
 		status = http.StatusBadRequest
-	case usecase.E_NOTFOUND:
+	case usecase.ErrNotFound:
 		status = http.StatusNotFound
-	case usecase.E_NEXPECTED:
+	case usecase.ErrUnexpected:
 		status = http.StatusInternalServerError
 	default:
 		panic(fmt.Sprintf("Unknown Result Code '%s'", result.Code()))
