@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"comment-api-on-gae/interface/presenter"
-	"comment-api-on-gae/interface/repository"
-	"comment-api-on-gae/usecase"
+	"commenting/interface/presenter"
+	"commenting/interface/repository"
+	"commenting/usecase"
 	"github.com/labstack/echo"
 )
 
@@ -36,9 +36,8 @@ func (ctl *CommentController) List(c echo.Context) error {
 
 	// TODO: 別集約を1つにまとめて返すための正しい方法
 	// TODO: Json用structの置き場所やネーミング
-	var json []interface{}
+	json := make([]interface{}, len(comments))
 	if len(comments) > 0 {
-		json = make([]interface{}, len(comments))
 		p := &presenter.CommentPresenter{}
 		for i := 0; i < len(comments); i++ {
 			if commenters[i] != nil && comments[i] != nil {
@@ -67,12 +66,7 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 		repository.NewCommenterRepository(ctx),
 		repository.NewPageRepository(ctx),
 	)
-	comment, commenter, result := u.PostComment(params.PageId, params.Name, params.Text)
+	result := u.PostComment(params.PageId, params.Name, params.Text)
 
-	var json interface{}
-	if comment != nil && commenter != nil {
-		p := &presenter.CommentPresenter{}
-		json = p.Render(comment, commenter)
-	}
-	return renderJSON(c, json, result)
+	return renderJSON(c, nil, result)
 }

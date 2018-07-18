@@ -1,7 +1,7 @@
 package presenter
 
 import (
-	"comment-api-on-gae/domain"
+	"commenting/domain"
 	"time"
 )
 

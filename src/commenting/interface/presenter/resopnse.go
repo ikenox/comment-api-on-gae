@@ -1,6 +1,6 @@
 package presenter
 
-import "comment-api-on-gae/usecase"
+import "commenting/usecase"
 
 type responseJson struct {
 	Message string      `json:"message"`

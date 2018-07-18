@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"comment-api-on-gae/interface/controller"
+	"commenting/interface/controller"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
 	"github.com/labstack/echo/middleware"
@@ -36,7 +36,6 @@ func useAppEngine(next echo.HandlerFunc) echo.HandlerFunc {
 			if err != nil {
 				log.Errorf(ctx, "unresolve to set namespace (err %v)", err)
 			}
-			log.Infof(ctx, "namespace:%s", namespace)
 			c.SetStdContext(ctx)
 		}
 		return next(c)

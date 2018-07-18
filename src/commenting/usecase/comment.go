@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"comment-api-on-gae/domain"
+	"commenting/domain"
 	"time"
 )
 
@@ -25,7 +25,7 @@ func NewCommentUseCase(
 }
 
 // デメリットあんまり無さそうなのでコマンドとクエリの責務分離してない
-func (u *CommentUseCase) PostComment(strPageId string, name string, text string) (*domain.Comment, *domain.Commenter, *Result) {
+func (u *CommentUseCase) PostComment(strPageId string, name string, text string) *Result {
 	// ドメイン層でPageIdのバリデーションエラーハンドリングしようとするといたるところにエラーハンドリングが散らばるのでやめた方良さそう
 	// この例だと、NewPageIdがエラー返しちゃうとstring => PageIdの変換をするいたるところにエラーハンドリングのボイラープレートロジックが書かれる
 	// ドメインのどこかで発生してたらい回しにされまくって返ってきたエラーをcaseに分けてハンドリングするの辛い
@@ -38,7 +38,7 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	// アプリケーション層以下では不純物混ざらないという前提で書けるので全体的に記述量減るしシンプルになる気がした
 	// ドメインにIsValidXXといったメソッド増えまくりそうなのはちょっとあれかも。static method欲しくなる。。
 	if !domain.IsValidPageId(strPageId) {
-		return nil, nil, &Result{
+		return &Result{
 			code:    E_INVALID,
 			message: "PageId is invalid",
 		}
@@ -49,19 +49,17 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	// usecaseに関してはDRYじゃなくても弊害少ない？
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
-		page = domain.NewPage(u.pageRepository.NextPageId())
+		page = domain.NewPage(pageId)
 	}
 	u.pageRepository.Add(page)
 
 	commenter := domain.NewCommenter(u.commenterRepository.NextCommenterId(), name)
-	u.commenterRepository.Add(commenter)
-
 	comment := commenter.NewComment(u.commentRepository.NextCommentId(), text, page, time.Now())
+
+	u.commenterRepository.Add(commenter)
 	u.commentRepository.Add(comment)
 
-	// TODO: もうちょっとかっこよく返したい
-	// comment, commenterはどちらも存在するor存在しないというのをコードで表明できていない
-	return comment, commenter, &Result{code: OK}
+	return &Result{code: OK}
 }
 
 func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, []*domain.Commenter, *Result) {
@@ -77,10 +75,7 @@ func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, []*do
 
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
-		return nil, nil, &Result{
-			message: "Page is not found",
-			code:    E_NOTFOUND,
-		}
+		return []*domain.Comment{}, []*domain.Commenter{}, &Result{code: OK}
 	}
 
 	comments := u.commentRepository.FindByPageId(page.PageId())

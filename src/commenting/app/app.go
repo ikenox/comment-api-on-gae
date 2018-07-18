@@ -1,7 +1,7 @@
 package main
 
 import (
-	"comment-api-on-gae/middleware"
+	"commenting/middleware"
 	"net/http"
 )
 

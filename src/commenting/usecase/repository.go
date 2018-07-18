@@ -1,6 +1,6 @@
 package usecase
 
-import "comment-api-on-gae/domain"
+import "commenting/domain"
 
 type CommentRepository interface {
 	NextCommentId() domain.CommentId
@@ -10,7 +10,6 @@ type CommentRepository interface {
 }
 
 type PageRepository interface {
-	NextPageId() domain.PageId
 	Add(page *domain.Page)
 	Delete(page domain.PageId)
 	Get(pageId domain.PageId) *domain.Page

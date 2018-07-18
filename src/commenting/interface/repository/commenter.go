@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"comment-api-on-gae/domain"
-	"comment-api-on-gae/usecase"
+	"commenting/domain"
+	"commenting/usecase"
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/datastore"
 )

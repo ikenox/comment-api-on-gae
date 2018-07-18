@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"comment-api-on-gae/interface/presenter"
-	"comment-api-on-gae/usecase"
+	"commenting/interface/presenter"
+	"commenting/usecase"
 	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
@@ -16,9 +16,9 @@ func renderJSON(c echo.Context, json interface{}, result *usecase.Result) error 
 	case usecase.E_INVALID:
 		status = http.StatusBadRequest
 	case usecase.E_NOTFOUND:
-		status = http.StatusInternalServerError
-	case usecase.E_NEXPECTED:
 		status = http.StatusNotFound
+	case usecase.E_NEXPECTED:
+		status = http.StatusInternalServerError
 	default:
 		panic(fmt.Sprintf("Unknown Result Code '%s'", result.Code()))
 	}

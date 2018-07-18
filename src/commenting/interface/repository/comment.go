@@ -1,11 +1,12 @@
 package repository
 
 import (
-	"comment-api-on-gae/domain"
-	"comment-api-on-gae/usecase"
+	"commenting/domain"
+	"commenting/usecase"
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/datastore"
 	"time"
+	"util"
 )
 
 type commentRepository struct {
@@ -14,7 +15,7 @@ type commentRepository struct {
 
 type commentEntity struct {
 	PageId      string
-	Text        string
+	Text        []byte
 	CommenterId int64
 	CommentedAt time.Time
 }
@@ -57,7 +58,7 @@ func (r *commentRepository) toDataStoreEntity(comment *domain.Comment) (*datasto
 	key := r.newKey(int64(comment.CommentId()), "")
 	entity := &commentEntity{
 		PageId:      string(comment.PageId()),
-		Text:        comment.Text(),
+		Text:        util.StringToBytes(comment.Text()),
 		CommenterId: int64(comment.CommenterId()),
 		CommentedAt: comment.CommentedAt(),
 	}
@@ -68,7 +69,7 @@ func (r *commentRepository) build(key *datastore.Key, entity *commentEntity) *do
 	return domain.NewComment(
 		domain.CommentId(key.IntID()),
 		domain.PageId(entity.PageId),
-		entity.Text,
+		util.BytesToString(entity.Text),
 		domain.CommenterId(entity.CommenterId),
 		entity.CommentedAt,
 	)

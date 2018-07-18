@@ -1,7 +1,7 @@
 package middleware_test
 
 import (
-	"comment-api-on-gae/middleware"
+	"commenting/middleware"
 	"encoding/json"
 	"google.golang.org/appengine/aetest"
 	"net/http"
@@ -23,8 +23,8 @@ func TestCommentAndView(t *testing.T) {
 		"commenter1",
 		"text",
 	})
-	if rec.Code != http.StatusCreated {
-		t.Errorf("got %v\nwant %v", rec.Code, http.StatusCreated)
+	if rec.Code != http.StatusOK {
+		t.Errorf("got %v\nwant %v", rec.Code, http.StatusOK)
 	}
 
 	rec = s.Request("GET", "/comment?PageId=pageId1", nil)
@@ -40,8 +40,7 @@ type testServerClient struct {
 }
 
 func newTestServerClient(t *testing.T) (*testServerClient, func()) {
-	opt := aetest.Options{StronglyConsistentDatastore: true}
-	inst, err := aetest.NewInstance(&opt)
+	inst, err := aetest.NewInstance(&aetest.Options{StronglyConsistentDatastore: true})
 	if err != nil {
 		t.Fatal(err)
 	}

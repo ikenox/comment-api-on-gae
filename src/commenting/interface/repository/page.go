@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"comment-api-on-gae/domain"
-	"comment-api-on-gae/usecase"
+	"commenting/domain"
+	"commenting/usecase"
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/datastore"
 )
@@ -15,10 +15,6 @@ func NewPageRepository(ctx context.Context) usecase.PageRepository {
 	return &pageRepository{
 		dataStoreRepository: newDataStoreRepository(ctx, "Page"),
 	}
-}
-
-func (r *pageRepository) NextPageId() domain.PageId {
-	return domain.PageId(r.nextID())
 }
 
 func (r *pageRepository) Add(page *domain.Page) {
