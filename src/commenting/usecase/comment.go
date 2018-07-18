@@ -40,7 +40,10 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	// アプリケーション層以下では不純物混ざらないという前提で書けるので全体的に記述量減るしシンプルになる気がした
 	// ドメインにIsValidXXといったメソッド増えまくりそうなのはちょっとあれかも。static method欲しくなる。。
 	if err := domain.PageIdSpec.CheckValidityOf(strPageId); err != nil {
-		return &Result{ErrInvalid, fmt.Sprintf("PageId is invalid: %s", err.Error())}
+		return &Result{
+			ErrInvalid,
+			fmt.Sprintf("PageId is invalid: %s", err.Error()),
+		}
 	}
 
 	if nameLen := utf8.RuneCountInString(name); nameLen > 20 {
