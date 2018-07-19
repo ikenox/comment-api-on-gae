@@ -1,11 +1,11 @@
+application: ikenox-info-comment-api
 runtime: go
 api_version: go1.8
+version: 1
+
+threadsafe: true
 
 handlers:
   - url: /.*
     script: _go_app
-
-nobuild_files:
-  - commenting/vendor
-skip_files:
-  - commenting/vendor/.*$
+    secure: always
