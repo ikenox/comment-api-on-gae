@@ -1,6 +1,20 @@
 # Comment API on GAE
 
-API server of commenting service which is run on GAE
+API server of commenting service which is run on Google App Engine Standard Environment
+
+## About this project
+
+This project adopts Clean Architecture and Domain Driven Design, and keeps these principles as much as possible.
+
+Because of Clean Architecture, application logic and domain logic are independent with detail of infrastructure.  
+Followings are not appeared in core of application.
+
+- Various packages related to Google App Engine
+- Technological details of web application (e.g. context.Context)
+
+TBW:
+- Application architecture overview
+- Domain model overview
 
 ## Requirements
 
