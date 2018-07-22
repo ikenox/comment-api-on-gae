@@ -26,8 +26,12 @@ func NewCommentUseCase(
 	}
 }
 
-// デメリットあんまり無さそうなのでコマンドとクエリの責務分離してない
-func (u *CommentUseCase) PostComment(strPageId string, name string, text string) *Result {
+type CommentWithCommenter struct {
+	Comment   *domain.Comment
+	Commenter *domain.Commenter
+}
+
+func (u *CommentUseCase) PostComment(strPageId string, name string, text string) (*CommentWithCommenter, *Result) {
 	// ドメイン層でPageIdのバリデーションエラーハンドリングしようとするといたるところにエラーハンドリングが散らばるのでやめた方良さそう
 	// この例だと、NewPageIdがエラー返しちゃうとstring => PageIdの変換をするいたるところにエラーハンドリングのボイラープレートロジックが書かれる
 	// ドメインのどこかで発生してたらい回しにされまくって返ってきたエラーをcaseに分けてハンドリングするの辛い
@@ -40,22 +44,22 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	// アプリケーション層以下では不純物混ざらないという前提で書けるので全体的に記述量減るしシンプルになる気がした
 	// ドメインにIsValidXXといったメソッド増えまくりそうなのはちょっとあれかも。static method欲しくなる。。
 	if err := domain.PageIdSpec.CheckValidityOf(strPageId); err != nil {
-		return &Result{
+		return nil, &Result{
 			ErrInvalid,
 			fmt.Sprintf("PageId is invalid: %s", err.Error()),
 		}
 	}
 
 	if nameLen := utf8.RuneCountInString(name); nameLen > 20 {
-		return &Result{ErrInvalid, "Name is too long."}
+		return nil, &Result{ErrInvalid, "Name is too long."}
 	}
 
 	// TODO: ここらへんドメインで定義されるべきか
 	if text == "" {
-		return &Result{ErrInvalid, "Comment is too long."}
+		return nil, &Result{ErrInvalid, "Comment is empty."}
 	}
 	if commentLen := utf8.RuneCountInString(text); commentLen > 1000 {
-		return &Result{ErrInvalid, "Comment is too long."}
+		return nil, &Result{ErrInvalid, "Comment is too long."}
 	}
 
 	pageId := domain.NewPageId(strPageId)
@@ -71,14 +75,15 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	u.commenterRepository.Add(commenter)
 	u.commentRepository.Add(comment)
 
-	return &Result{code: OK}
+	// デメリットあんまり無さそうなのでコマンドとクエリの責務分離してない
+	return &CommentWithCommenter{comment, commenter}, &Result{code: OK}
 }
 
-func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, []*domain.Commenter, *Result) {
+func (u *CommentUseCase) GetComments(strPageId string) ([]*CommentWithCommenter, *Result) {
 	if err := domain.PageIdSpec.CheckValidityOf(strPageId); err != nil {
 		// messageがDRYじゃないけどそんなに弊害無いと判断、messageの時点でそもそも統一性持たせなくていい前提
 		// 統一性もたせる必要があるならcodeをそのレベルまで細分化すべき
-		return nil, nil, &Result{
+		return nil, &Result{
 			ErrInvalid,
 			fmt.Sprintf("PageId is invalid: %s", err.Error()),
 		}
@@ -87,7 +92,7 @@ func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, []*do
 
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
-		return []*domain.Comment{}, []*domain.Commenter{}, &Result{code: OK}
+		return []*CommentWithCommenter{}, &Result{code: OK}
 	}
 
 	comments := u.commentRepository.FindByPageId(page.PageId())
@@ -98,7 +103,19 @@ func (u *CommentUseCase) GetComments(strPageId string) ([]*domain.Comment, []*do
 	}
 	commenters := u.commenterRepository.FindByComments(commentIds)
 
+	data := make([]*CommentWithCommenter, len(comments))
+	if len(comments) > 0 {
+		for i := 0; i < len(comments); i++ {
+			if commenters[i] != nil && comments[i] != nil {
+				data[i] = &CommentWithCommenter{
+					Comment:   comments[i],
+					Commenter: commenters[i],
+				}
+			}
+		}
+	}
+
 	// TODO: もうちょっとかっこよく返したい
 	// comment, commenterはどちらも存在するor存在しないというのをコードで表明できていない
-	return comments, commenters, &Result{code: OK}
+	return data, &Result{code: OK}
 }

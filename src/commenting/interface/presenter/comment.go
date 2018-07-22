@@ -1,36 +1,40 @@
 package presenter
 
 import (
-	"commenting/domain"
+	"commenting/usecase"
 	"time"
 )
 
-type commentJson struct {
-	CommentId   int64          `json:"commentId"`
-	PageId      string         `json:"pageId"`
-	Text        string         `json:"text"`
-	CommentedAt time.Time      `json:"commentedAt"`
-	Commenter   *commenterJson `json:"commenter"`
+type CommentWithCommenter struct {
+	Comment   *comment   `json:"comment"`
+	Commenter *commenter `json:"commenter"`
 }
 
-type commenterJson struct {
+type comment struct {
+	CommentId   int64     `json:"commentId"`
+	PageId      string    `json:"pageId"`
+	Text        string    `json:"text"`
+	CommentedAt time.Time `json:"commentedAt"`
+}
+
+type commenter struct {
 	CommenterId int64  `json:"commenterId"`
 	Name        string `json:"name"`
 }
 
-// TODO: 適切な名前は？CommentPresenterと言いつつCommenterも扱っている
-// TODO: ぶっちゃけentityがjson情報持ってたほうが楽か
 type CommentPresenter struct{}
 
-func (p *CommentPresenter) Render(comment *domain.Comment, commenter *domain.Commenter) interface{} {
-	return &commentJson{
-		CommentId:   int64(comment.CommentId()),
-		PageId:      string(comment.PageId()),
-		Text:        comment.Text(),
-		CommentedAt: comment.CommentedAt(),
-		Commenter: &commenterJson{
-			CommenterId: int64(comment.CommenterId()),
-			Name:        commenter.Name(),
+func (p *CommentPresenter) Render(d *usecase.CommentWithCommenter) *CommentWithCommenter {
+	return &CommentWithCommenter{
+		Comment: &comment{
+			CommentId:   int64(d.Comment.CommentId()),
+			PageId:      string(d.Comment.PageId()),
+			Text:        d.Comment.Text(),
+			CommentedAt: d.Comment.CommentedAt(),
+		},
+		Commenter: &commenter{
+			CommenterId: int64(d.Commenter.CommenterId()),
+			Name:        string(d.Commenter.Name()),
 		},
 	}
 }
