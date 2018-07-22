@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type CommentWithCommenter struct {
+type commentWithCommenter struct {
 	Comment   *comment   `json:"comment"`
 	Commenter *commenter `json:"commenter"`
 }
@@ -24,8 +24,16 @@ type commenter struct {
 
 type CommentPresenter struct{}
 
-func (p *CommentPresenter) Render(d *usecase.CommentWithCommenter) *CommentWithCommenter {
-	return &CommentWithCommenter{
+func (p *CommentPresenter) RenderArray(d []*usecase.CommentWithCommenter) []*commentWithCommenter {
+	json := make([]*commentWithCommenter, len(d))
+	for i, c := range d {
+		json[i] = p.Render(c)
+	}
+	return json
+}
+
+func (p *CommentPresenter) Render(d *usecase.CommentWithCommenter) *commentWithCommenter {
+	return &commentWithCommenter{
 		Comment: &comment{
 			CommentId:   int64(d.Comment.CommentId()),
 			PageId:      string(d.Comment.PageId()),

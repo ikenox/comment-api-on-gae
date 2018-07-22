@@ -25,11 +25,7 @@ func (ctl *CommentController) List(c echo.Context) error {
 	)
 	data, res := u.GetComments(pageId)
 
-	p := &presenter.CommentPresenter{}
-	json := make([]*presenter.CommentWithCommenter, len(data))
-	for i, c := range data {
-		json[i] = p.Render(c)
-	}
+	json := (&presenter.CommentPresenter{}).RenderArray(data)
 	return renderJSON(c, json, res)
 }
 
