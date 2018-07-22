@@ -1,6 +1,6 @@
 # Comment API on GAE
 
-Commenting system run on GAE
+API server of commenting service which is run on GAE
 
 ## Requirements
 
