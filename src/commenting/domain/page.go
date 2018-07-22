@@ -35,13 +35,15 @@ type pageIdSpec struct{}
 
 var PageIdSpec = &pageIdSpec{}
 
+type PageIdValidityError error
+
 var (
-	ErrEmptyPageId      = errors.New("PageId is empty")
-	ErrInvalidCharacter = errors.New("PageId contains invalid character")
-	ErrPageIdTooLong    = errors.New("PageId is too long")
+	ErrEmptyPageId      PageIdValidityError = errors.New("PageId is empty")
+	ErrInvalidCharacter PageIdValidityError = errors.New("PageId contains invalid character")
+	ErrPageIdTooLong    PageIdValidityError = errors.New("PageId is too long")
 )
 
-func (s *pageIdSpec) CheckValidityOf(pageId string) error {
+func (s *pageIdSpec) CheckValidityOf(pageId string) PageIdValidityError {
 	if pageId == "" {
 		return ErrEmptyPageId
 	}
