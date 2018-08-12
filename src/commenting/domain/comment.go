@@ -2,20 +2,20 @@ package domain
 
 import "time"
 
-type CommentId int64
+type CommentID int64
 type Comment struct {
-	commentId   CommentId
-	pageId      PageId
+	commentId   CommentID
+	pageId      PageID
 	text        string
-	commenterId CommenterId
+	commenterId CommenterID
 	commentedAt time.Time
 }
 
 func NewComment(
-	commentId CommentId,
-	pageId PageId,
+	commentId CommentID,
+	pageId PageID,
 	text string,
-	commenterId CommenterId,
+	commenterId CommenterID,
 	commentedAt time.Time,
 ) *Comment {
 	return &Comment{
@@ -27,11 +27,11 @@ func NewComment(
 	}
 }
 
-func (c *Comment) CommentId() CommentId {
+func (c *Comment) CommentId() CommentID {
 	return c.commentId
 }
 
-func (c *Comment) CommenterId() CommenterId {
+func (c *Comment) CommenterId() CommenterID {
 	return c.commenterId
 }
 
@@ -43,6 +43,6 @@ func (c *Comment) Text() string {
 	return c.text
 }
 
-func (c *Comment) PageId() PageId {
+func (c *Comment) PageId() PageID {
 	return c.pageId
 }

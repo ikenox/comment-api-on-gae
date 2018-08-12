@@ -2,9 +2,9 @@ package domain
 
 import "time"
 
-type CommenterId int
+type CommenterID int
 type Commenter struct {
-	commenterId CommenterId
+	commenterId CommenterID
 	name        string
 }
 
@@ -12,11 +12,11 @@ func (c *Commenter) Name() string {
 	return c.name
 }
 
-func (c *Commenter) CommenterId() CommenterId {
+func (c *Commenter) CommenterId() CommenterID {
 	return c.commenterId
 }
 
-func (c *Commenter) NewComment(commentId CommentId, text string, page *Page, commentedAt time.Time) *Comment {
+func (c *Commenter) NewComment(commentId CommentID, text string, page *Page, commentedAt time.Time) *Comment {
 	return NewComment(
 		commentId,
 		page.pageId,
@@ -26,7 +26,7 @@ func (c *Commenter) NewComment(commentId CommentId, text string, page *Page, com
 	)
 }
 
-func NewCommenter(commenterId CommenterId, name string) *Commenter {
+func NewCommenter(commenterId CommenterID, name string) *Commenter {
 	return &Commenter{
 		commenterId: commenterId,
 		name:        name,

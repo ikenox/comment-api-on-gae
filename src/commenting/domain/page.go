@@ -1,62 +1,21 @@
 package domain
 
-import (
-	"errors"
-	"fmt"
-	"regexp"
-)
+type PageID string
 
-type PageId string
-
-func NewPageId(pageId string) PageId {
-	if err := PageIdSpec.CheckValidityOf(pageId); err != nil {
-		panic(fmt.Sprintf("Invalid pageId: %s", err.Error()))
-	}
-	return PageId(pageId)
+func NewPageID(pageID string) PageID {
+	return PageID(pageID)
 }
-
-var pageIdRegexp = regexp.MustCompile("^[0-9a-zA-Z_\\-]+$")
 
 type Page struct {
-	pageId PageId
+	pageId PageID
 }
 
-func NewPage(pageId PageId) *Page {
+func NewPage(pageId PageID) *Page {
 	return &Page{
 		pageId: pageId,
 	}
 }
 
-func (p *Page) PageId() PageId {
+func (p *Page) PageId() PageID {
 	return p.pageId
-}
-
-type pageIdSpec struct{}
-
-var PageIdSpec = &pageIdSpec{}
-
-type PageIdValidityError error
-
-var (
-	ErrEmptyPageId      PageIdValidityError = errors.New("PageId is empty")
-	ErrInvalidCharacter PageIdValidityError = errors.New("PageId contains invalid character")
-	ErrPageIdTooLong    PageIdValidityError = errors.New("PageId is too long")
-)
-
-func (s *pageIdSpec) CheckValidityOf(pageId string) PageIdValidityError {
-	if pageId == "" {
-		return ErrEmptyPageId
-	}
-
-	re := pageIdRegexp.Copy()
-	pageId = re.FindString(pageId)
-	if pageId == "" {
-		return ErrInvalidCharacter
-	}
-
-	if len(pageId) > 64 {
-		return ErrPageIdTooLong
-	}
-
-	return nil
 }

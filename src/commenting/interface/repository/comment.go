@@ -14,7 +14,7 @@ type commentRepository struct {
 }
 
 type commentEntity struct {
-	PageId      string
+	PageID      string
 	Text        []byte
 	CommenterId int64
 	CommentedAt time.Time
@@ -26,8 +26,8 @@ func NewCommentRepository(ctx context.Context) usecase.CommentRepository {
 	}
 }
 
-func (r *commentRepository) NextCommentId() domain.CommentId {
-	return domain.CommentId(r.nextID())
+func (r *commentRepository) NextCommentID() domain.CommentID {
+	return domain.CommentID(r.nextID())
 }
 
 func (r *commentRepository) Add(comment *domain.Comment) {
@@ -35,14 +35,14 @@ func (r *commentRepository) Add(comment *domain.Comment) {
 	r.put(key, entity)
 }
 
-func (r *commentRepository) Delete(commentId domain.CommentId) {
+func (r *commentRepository) Delete(commentId domain.CommentID) {
 	r.delete(r.newKey(int64(commentId), ""))
 }
 
-func (r *commentRepository) FindByPageId(pageId domain.PageId) []*domain.Comment {
+func (r *commentRepository) FindByPageID(pageId domain.PageID) []*domain.Comment {
 	q := r.newQuery()
 	var commentEntities []commentEntity
-	keys, err := q.Filter("PageId =", pageId).GetAll(r.ctx, &commentEntities)
+	keys, err := q.Filter("PageID =", pageId).GetAll(r.ctx, &commentEntities)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -57,7 +57,7 @@ func (r *commentRepository) FindByPageId(pageId domain.PageId) []*domain.Comment
 func (r *commentRepository) toDataStoreEntity(comment *domain.Comment) (*datastore.Key, *commentEntity) {
 	key := r.newKey(int64(comment.CommentId()), "")
 	entity := &commentEntity{
-		PageId:      string(comment.PageId()),
+		PageID:      string(comment.PageId()),
 		Text:        util.StringToBytes(comment.Text()),
 		CommenterId: int64(comment.CommenterId()),
 		CommentedAt: comment.CommentedAt(),
@@ -67,10 +67,10 @@ func (r *commentRepository) toDataStoreEntity(comment *domain.Comment) (*datasto
 
 func (r *commentRepository) build(key *datastore.Key, entity *commentEntity) *domain.Comment {
 	return domain.NewComment(
-		domain.CommentId(key.IntID()),
-		domain.PageId(entity.PageId),
+		domain.CommentID(key.IntID()),
+		domain.PageID(entity.PageID),
 		util.BytesToString(entity.Text),
-		domain.CommenterId(entity.CommenterId),
+		domain.CommenterID(entity.CommenterId),
 		entity.CommentedAt,
 	)
 }

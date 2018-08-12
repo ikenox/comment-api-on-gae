@@ -113,14 +113,14 @@ func TestPostComment(t *testing.T) {
 	}
 
 	for _, c := range validCases {
-		res := u.PostComment(c.pageId, c.name, c.text)
+		_, res := u.PostComment(c.pageId, c.name, c.text)
 		if res.Code() != usecase.OK {
 			t.Errorf("%s: got '%v: %v' want '%v'", c.test, res.Code(), res.Message(), usecase.OK)
 		}
 	}
 
 	for _, c := range invalidCases {
-		res := u.PostComment(c.pageId, c.name, c.text)
+		_, res := u.PostComment(c.pageId, c.name, c.text)
 		if res.Code() != usecase.ErrInvalid {
 			t.Errorf("%s: got '%v' want '%v'", c.test, res.Code(), usecase.ErrInvalid)
 		}

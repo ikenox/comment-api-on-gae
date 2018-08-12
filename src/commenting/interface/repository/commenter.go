@@ -21,8 +21,8 @@ func NewCommenterRepository(ctx context.Context) usecase.CommenterRepository {
 	}
 }
 
-func (r *commenterRepository) NextCommenterId() domain.CommenterId {
-	return domain.CommenterId(r.nextID())
+func (r *commenterRepository) NextCommenterID() domain.CommenterID {
+	return domain.CommenterID(r.nextID())
 }
 
 func (r *commenterRepository) Add(commenter *domain.Commenter) {
@@ -30,11 +30,11 @@ func (r *commenterRepository) Add(commenter *domain.Commenter) {
 	r.put(key, entity)
 }
 
-func (r *commenterRepository) Delete(id domain.CommenterId) {
+func (r *commenterRepository) Delete(id domain.CommenterID) {
 	r.delete(r.newKey(int64(id), ""))
 }
 
-func (r *commenterRepository) Get(commenterId domain.CommenterId) *domain.Commenter {
+func (r *commenterRepository) Get(commenterId domain.CommenterID) *domain.Commenter {
 	entity := new(commenterEntity)
 	key := r.newKey(int64(commenterId), "")
 	ok := r.get(key, entity)
@@ -44,7 +44,7 @@ func (r *commenterRepository) Get(commenterId domain.CommenterId) *domain.Commen
 	return r.build(key, entity)
 }
 
-func (r *commenterRepository) FindByComments(commenterIds []domain.CommenterId) []*domain.Commenter {
+func (r *commenterRepository) FindByComments(commenterIds []domain.CommenterID) []*domain.Commenter {
 	entities := make([]*commenterEntity, len(commenterIds))
 	keys := make([]*datastore.Key, len(commenterIds))
 	for i, id := range commenterIds {
@@ -54,7 +54,7 @@ func (r *commenterRepository) FindByComments(commenterIds []domain.CommenterId) 
 
 	commenters := make([]*domain.Commenter, len(commenterIds))
 	for i, keys := range keys {
-		commenters[i] = domain.NewCommenter(domain.CommenterId(keys.IntID()), entities[i].Name)
+		commenters[i] = domain.NewCommenter(domain.CommenterID(keys.IntID()), entities[i].Name)
 	}
 	return commenters
 }
@@ -68,5 +68,5 @@ func (r *commenterRepository) toDataStoreEntity(commenter *domain.Commenter) (*d
 }
 
 func (r *commenterRepository) build(key *datastore.Key, entity *commenterEntity) *domain.Commenter {
-	return domain.NewCommenter(domain.CommenterId(key.IntID()), entity.Name)
+	return domain.NewCommenter(domain.CommenterID(key.IntID()), entity.Name)
 }

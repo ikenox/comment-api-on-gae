@@ -22,11 +22,11 @@ func (r *pageRepository) Add(page *domain.Page) {
 	r.put(key, entity)
 }
 
-func (r *pageRepository) Delete(id domain.PageId) {
+func (r *pageRepository) Delete(id domain.PageID) {
 	r.delete(r.newKey(0, string(id)))
 }
 
-func (r *pageRepository) Get(id domain.PageId) *domain.Page {
+func (r *pageRepository) Get(id domain.PageID) *domain.Page {
 	entity := new(pageEntity)
 	key := r.newKey(0, string(id))
 	ok := r.get(key, entity)
@@ -47,5 +47,5 @@ func (r *pageRepository) toDataStoreEntity(page *domain.Page) (*datastore.Key, *
 }
 
 func (r *pageRepository) build(key *datastore.Key, entity *pageEntity) *domain.Page {
-	return domain.NewPage(domain.PageId(key.StringID()))
+	return domain.NewPage(domain.PageID(key.StringID()))
 }

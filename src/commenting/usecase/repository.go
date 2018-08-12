@@ -3,22 +3,22 @@ package usecase
 import "commenting/domain"
 
 type CommentRepository interface {
-	NextCommentId() domain.CommentId
+	NextCommentID() domain.CommentID
 	Add(comment *domain.Comment)
-	Delete(comment domain.CommentId)
-	FindByPageId(page domain.PageId) []*domain.Comment
+	Delete(comment domain.CommentID)
+	FindByPageID(page domain.PageID) []*domain.Comment
 }
 
 type PageRepository interface {
 	Add(page *domain.Page)
-	Delete(page domain.PageId)
-	Get(pageId domain.PageId) *domain.Page
+	Delete(page domain.PageID)
+	Get(pageId domain.PageID) *domain.Page
 }
 
 type CommenterRepository interface {
-	NextCommenterId() domain.CommenterId
-	FindByComments(commenterIds []domain.CommenterId) []*domain.Commenter
+	NextCommenterID() domain.CommenterID
+	FindByComments(commenterIDs []domain.CommenterID) []*domain.Commenter
 	Add(commenter *domain.Commenter)
-	Delete(commenterId domain.CommenterId)
-	Get(commenterId domain.CommenterId) *domain.Commenter
+	Delete(commenterId domain.CommenterID)
+	Get(commenterId domain.CommenterID) *domain.Commenter
 }
