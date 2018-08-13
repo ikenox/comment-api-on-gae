@@ -7,7 +7,7 @@ API server of commenting service which is run on Google App Engine Standard Envi
 This project adopts Clean Architecture and Domain Driven Design, and keeps these principles as much as possible.
 
 Because of Clean Architecture, application logic and domain logic are independent with detail of infrastructure.  
-Followings are not appeared in core of application.
+Followings are not appeared in the core of application.
 
 - Various packages related to Google App Engine
 - Technological details of web application (e.g. context.Context)
