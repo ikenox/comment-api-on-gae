@@ -6,5 +6,5 @@ import (
 )
 
 func init() {
-	http.Handle("/", middleware.NewHandler())
+	http.Handle("/", middleware.NewServer())
 }

@@ -7,15 +7,15 @@ func NewPageID(pageID string) PageID {
 }
 
 type Page struct {
-	pageId PageID
+	pageID PageID
 }
 
 func NewPage(pageId PageID) *Page {
 	return &Page{
-		pageId: pageId,
+		pageID: pageId,
 	}
 }
 
 func (p *Page) PageId() PageID {
-	return p.pageId
+	return p.pageID
 }

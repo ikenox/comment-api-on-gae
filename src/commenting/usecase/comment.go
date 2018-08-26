@@ -1,10 +1,10 @@
 package usecase
 
 import (
+	"commenting/common"
 	"commenting/domain"
 	"commenting/usecase/validator"
 	"fmt"
-	"time"
 )
 
 type CommentUseCase struct {
@@ -67,31 +67,7 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	u.pageRepository.Add(page)
 
 	commenter := domain.NewCommenter(u.commenterRepository.NextCommenterID(), name)
-	comment := commenter.NewComment(u.commentRepository.NextCommentID(), text, page, time.Now())
-
-	u.commenterRepository.Add(commenter)
-	u.commentRepository.Add(comment)
-
-	// デメリットあんまり無さそうなのでコマンドとクエリの責務分離してない
-	return &CommentWithCommenter{comment, commenter}, &Result{code: OK}
-}
-
-func (u *CommentUseCase) ReplyComment(commentID int64, name string, text string) (*CommentWithCommenter, *Result) {
-	if err := validator.ValidateComment(text); err != nil {
-		return nil, &Result{
-			ErrInvalid,
-			fmt.Sprintf(err.Error()),
-		}
-	}
-	if err := validator.ValidateCommenterName(name); err != nil {
-		return nil, &Result{
-			ErrInvalid,
-			fmt.Sprintf(err.Error()),
-		}
-	}
-
-	commenter := domain.NewCommenter(u.commenterRepository.NextCommenterID(), name)
-	comment := commenter.NewComment(u.commentRepository.NextCommentID(), text, page, time.Now())
+	comment := commenter.NewComment(u.commentRepository.NextCommentID(), text, page, env.CurrentTime())
 
 	u.commenterRepository.Add(commenter)
 	u.commentRepository.Add(comment)

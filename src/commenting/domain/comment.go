@@ -3,6 +3,7 @@ package domain
 import "time"
 
 type CommentID int64
+
 type Comment struct {
 	commentId   CommentID
 	pageId      PageID
@@ -18,6 +19,7 @@ func NewComment(
 	commenterId CommenterID,
 	commentedAt time.Time,
 ) *Comment {
+	// Commentが絶対守らなくてはならない不変条件はここに
 	return &Comment{
 		commentId:   commentId,
 		pageId:      pageId,

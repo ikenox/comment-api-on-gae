@@ -13,7 +13,7 @@ func NewCommentController() *CommentController {
 	return &CommentController{}
 }
 
-// adapter層なので一意な変換以外のロジックは基本入らなくなる？ガード節とかも基本はいらない？
+// adapter層なので一意な変換以外のロジックは基本入らなくなる？
 func (ctl *CommentController) List(c echo.Context) error {
 	pageId := c.QueryParam("pageId")
 
@@ -30,9 +30,16 @@ func (ctl *CommentController) List(c echo.Context) error {
 }
 
 func (ctl *CommentController) PostComment(c echo.Context) error {
-	pageId := c.FormValue("pageId")
-	name := c.FormValue("name")
-	text := c.FormValue("text")
+	var p = &struct {
+		PageId string `json:"pageId"`
+		Name   string `json:"name"`
+		Text   string `json:"text"`
+	}{}
+	if err := c.Bind(p); err != nil {
+		// 変換エラーはinterface adapter層における異常系
+		// usecaseでのエラーはinterface adapterにとっては正常系
+		return err
+	}
 
 	ctx := c.StdContext()
 	u := usecase.NewCommentUseCase(
@@ -40,7 +47,7 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 		repository.NewCommenterRepository(ctx),
 		repository.NewPageRepository(ctx),
 	)
-	data, result := u.PostComment(pageId, name, text)
+	data, result := u.PostComment(p.PageId, p.Name, p.Text)
 
 	json := (&presenter.CommentPresenter{}).Render(data)
 	return renderJSON(c, json, result)

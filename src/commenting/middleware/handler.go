@@ -1,8 +1,10 @@
 package middleware
 
 import (
+	"commenting/common"
 	"commenting/interface/controller"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/engine"
 	"github.com/labstack/echo/engine/standard"
 	"github.com/labstack/echo/middleware"
 	"google.golang.org/appengine"
@@ -10,7 +12,13 @@ import (
 	"net/http"
 )
 
-func NewHandler() http.Handler {
+func NewServer() http.Handler {
+	s := standard.New("")
+	s.SetHandler(NewEcho())
+	return s
+}
+
+func NewEcho() engine.Handler {
 	e := echo.New()
 
 	e.Use(middleware.Logger())
@@ -18,19 +26,16 @@ func NewHandler() http.Handler {
 	//e.Use(middleware.Recover())
 	e.Use(useAppEngine)
 
-	pageController := controller.NewCommentController()
-	e.GET("/comment", pageController.List)
-	e.POST("/comment", pageController.PostComment)
-
-	s := standard.New("")
-	s.SetHandler(e)
-	return s
+	pc := controller.NewCommentController()
+	e.GET("/comment", pc.List)
+	e.POST("/comment", pc.PostComment)
+	return e
 }
 
 func useAppEngine(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if r, ok := c.Request().(*standard.Request); ok {
-			namespace := "development"
+			namespace := env.Namespace
 			ctx := appengine.WithContext(c.StdContext(), r.Request)
 			ctx, err := appengine.Namespace(ctx, namespace)
 			if err != nil {

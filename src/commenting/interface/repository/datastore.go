@@ -7,6 +7,7 @@ import (
 )
 
 // TODO: ここらへんリファクタ
+// middleware層行き？
 type dataStoreRepository struct {
 	ctx  context.Context
 	kind string

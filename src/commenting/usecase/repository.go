@@ -1,6 +1,8 @@
 package usecase
 
-import "commenting/domain"
+import (
+	"commenting/domain"
+)
 
 type CommentRepository interface {
 	NextCommentID() domain.CommentID

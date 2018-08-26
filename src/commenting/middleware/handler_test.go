@@ -3,33 +3,79 @@ package middleware_test
 import (
 	"commenting/middleware"
 	"encoding/json"
+	"github.com/koron/go-dproxy"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/appengine/aetest"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 )
 
-func TestCommentAndView(t *testing.T) {
+func TestCommentAndReply(t *testing.T) {
 	s, done := newTestServerClient(t)
 	defer done()
 
-	rec := s.Request("POST", "/comment", struct {
-		PageId string
-		Name   string
-		Text   string
-	}{
-		"pageId1",
-		"commenter1",
-		"text",
-	})
-	if rec.Code != http.StatusOK {
-		t.Errorf("got %v\nwant %v", rec.Code, http.StatusOK)
+	{
+		// post comment
+		rec := s.JsonRequest("POST", "/comment", struct {
+			PageId string `json:"pageId"`
+			Name   string `json:"name"`
+			Text   string `json:"text"`
+		}{
+			"pageId1",
+			"commenter1",
+			"text1",
+		})
+		assertStatusCode(t, rec, http.StatusOK)
 	}
 
-	rec = s.Request("GET", "/comment?PageId=pageId1", nil)
-	if rec.Code != http.StatusOK {
-		t.Errorf("got %v\nwant %v", rec.Code, http.StatusOK)
+	// get comment list
+	{
+		rec := s.JsonRequest("GET", "/comment?pageId=pageId1", nil)
+		assertStatusCode(t, rec, http.StatusOK)
+		var v interface{}
+		bytes, _ := ioutil.ReadAll(rec.Body)
+		json.Unmarshal(bytes, &v)
+		p := dproxy.New(v)
+
+		comment := p.M("data").A(0).M("comment")
+		if val, err := comment.M("text").Value(); err != nil {
+			t.Errorf(err.Error())
+		} else {
+			assert.Equal(t, val, "text1")
+		}
+		if val, err := comment.M("pageId").Value(); err != nil {
+			t.Errorf(err.Error())
+		} else {
+			assert.Equal(t, val, "pageId1")
+		}
+		if _, err := comment.M("commentedAt").String(); err != nil {
+			t.Errorf(err.Error())
+		}
+		if _, err := comment.M("commentId").Int64(); err != nil {
+			t.Errorf(err.Error())
+		}
+
+		commenter := p.M("data").A(0).M("commenter")
+		if val, err := commenter.M("name").String(); err != nil {
+			t.Errorf(err.Error())
+		} else {
+			assert.Equal(t, val, "commenter1")
+		}
+		if _, err := commenter.M("commenterId").Int64(); err != nil {
+			t.Errorf(err.Error())
+		}
+	}
+
+}
+
+func assertStatusCode(t *testing.T, rec *httptest.ResponseRecorder, code int) {
+	t.Helper()
+	if rec.Code != code {
+		body, _ := ioutil.ReadAll(rec.Result().Body)
+		t.Errorf("status code expected %v got %v, response body: %s", code, rec.Code, string(body))
 	}
 }
 
@@ -44,7 +90,7 @@ func newTestServerClient(t *testing.T) (*testServerClient, func()) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	handler := middleware.NewHandler()
+	handler := middleware.NewServer()
 	return &testServerClient{
 			inst:    inst,
 			handler: handler,
@@ -52,9 +98,10 @@ func newTestServerClient(t *testing.T) (*testServerClient, func()) {
 		}, func() {
 			inst.Close()
 		}
+
 }
 
-func (s *testServerClient) Request(method string, url string, params interface{}) *httptest.ResponseRecorder {
+func (s *testServerClient) JsonRequest(method string, url string, params interface{}) *httptest.ResponseRecorder {
 	marshal, err := json.Marshal(params)
 	if err != nil {
 		s.t.Fatal(err)

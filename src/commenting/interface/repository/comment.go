@@ -16,7 +16,7 @@ type commentRepository struct {
 type commentEntity struct {
 	PageID      string
 	Text        []byte
-	CommenterId int64
+	CommenterID int64
 	CommentedAt time.Time
 }
 
@@ -42,9 +42,9 @@ func (r *commentRepository) Delete(commentId domain.CommentID) {
 func (r *commentRepository) FindByPageID(pageId domain.PageID) []*domain.Comment {
 	q := r.newQuery()
 	var commentEntities []commentEntity
-	keys, err := q.Filter("PageID =", pageId).GetAll(r.ctx, &commentEntities)
-	if err != nil {
-		panic(err.Error())
+	keys, fuga := q.Filter("PageID =", pageId).GetAll(r.ctx, &commentEntities)
+	if fuga != nil {
+		panic(fuga.Error())
 	}
 
 	comments := make([]*domain.Comment, len(keys))
@@ -59,7 +59,7 @@ func (r *commentRepository) toDataStoreEntity(comment *domain.Comment) (*datasto
 	entity := &commentEntity{
 		PageID:      string(comment.PageId()),
 		Text:        util.StringToBytes(comment.Text()),
-		CommenterId: int64(comment.CommenterId()),
+		CommenterID: int64(comment.CommenterId()),
 		CommentedAt: comment.CommentedAt(),
 	}
 	return key, entity
@@ -70,7 +70,7 @@ func (r *commentRepository) build(key *datastore.Key, entity *commentEntity) *do
 		domain.CommentID(key.IntID()),
 		domain.PageID(entity.PageID),
 		util.BytesToString(entity.Text),
-		domain.CommenterID(entity.CommenterId),
+		domain.CommenterID(entity.CommenterID),
 		entity.CommentedAt,
 	)
 }
