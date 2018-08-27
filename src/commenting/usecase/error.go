@@ -21,13 +21,13 @@ type Code string
 //     INVALID
 //       PAGEID
 const (
-	OK            Code = "ok"         // success
-	ErrInvalid    Code = "invalid"    // validation failed
-	ErrNotFound   Code = "not found"  // resource not found
-	ErrUnexpected Code = "unexpected" // unknown error
+	OK         Code = "ok"         // success
+	CREATED    Code = "created"    // create success
+	INVALID    Code = "invalid"    // validation failed
+	NOTFOUND   Code = "not found"  // resource not found
+	UNEXPECTED Code = "unexpected" // unknown error
 )
 
-// データの入れ物でしかないのでコンストラクタ不要と判断
 type Result struct {
 	code    Code
 	message string

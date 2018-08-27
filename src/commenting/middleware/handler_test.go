@@ -1,5 +1,7 @@
 package middleware_test
 
+//TODO テストの抽象化について考える
+
 import (
 	"commenting/middleware"
 	"encoding/json"

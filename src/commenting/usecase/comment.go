@@ -1,10 +1,10 @@
 package usecase
 
 import (
-	"commenting/common"
 	"commenting/domain"
-	"commenting/usecase/validator"
-	"fmt"
+	"commenting/env"
+	"regexp"
+	"util"
 )
 
 type CommentUseCase struct {
@@ -30,38 +30,63 @@ type CommentWithCommenter struct {
 	Commenter *domain.Commenter
 }
 
+var pageIdRegexp = regexp.MustCompile("^[0-9a-zA-Z_\\-]+$")
+
 func (u *CommentUseCase) PostComment(strPageId string, name string, text string) (*CommentWithCommenter, *Result) {
 	// ドメイン層でPageIdのバリデーションエラーハンドリングしようとするといたるところにエラーハンドリングが散らばるので極力避けたほういい？
 	// この例だと、NewPageIdがエラー返しちゃうとstring => PageIdの変換をするいたるところにエラーハンドリングのボイラープレートロジックが書かれる
-	// 内側のレイヤなほどerror投げたときにそれをキャッチする処理かかなくてはいけなくなる箇所が増える
-	// ドメインのどこかで発生してたらい回しにされまくって返ってきたエラーをcaseに分けてハンドリングするの辛い
+	// 内側のレイヤなほどerror投げたときにそれをキャッチする処理かかなくてはいけなくなる箇所が増える、永続層から取り出すときとかにもバリデーションが走ることになる
 	// それは本当にドメインロジックなのかどうかを考えるのが良さそう（e.g. コメントの文字数制限したいのはアプリケーションの都合）
 	// なるべく外側のレイヤ(アプリケーション層)でバリデーションする前提でドメインロジック書いたほうがドメインがスッキリしそう
 	// 全体的に記述量減るしシンプルになる気がした
-	// そもそもエラーはドメインの概念じゃない？
-	// 実行時エラー返すんじゃなくて、「何が正常か」を明示的に表現している(メソッドが生えている)方がドメインモデルのあり方としては正しい気がする
-	if err := validator.ValidatePageID(strPageId); err != nil {
+	// そもそも「エラー」はドメインの概念じゃない？
+
+	// pageId
+	if strPageId == "" {
 		return nil, &Result{
-			ErrInvalid,
-			fmt.Sprintf(err.Error()),
+			code:    INVALID,
+			message: "PageID must not be empty",
 		}
 	}
-	if err := validator.ValidateComment(text); err != nil {
+	if strPageId = pageIdRegexp.Copy().FindString(strPageId); strPageId == "" {
 		return nil, &Result{
-			ErrInvalid,
-			fmt.Sprintf(err.Error()),
+			code:    INVALID,
+			message: "invalid character",
 		}
 	}
-	if err := validator.ValidateCommenterName(name); err != nil {
+	if len(strPageId) > 64 {
 		return nil, &Result{
-			ErrInvalid,
-			fmt.Sprintf(err.Error()),
+			code:    INVALID,
+			message: "page ID is too long",
+		}
+	}
+
+	// text
+	if text == "" {
+		return nil, &Result{
+			code:    INVALID,
+			message: "comment must not be empty",
+		}
+	}
+	if util.LengthOf(text) > 1000 {
+		return nil, &Result{
+			code:    INVALID,
+			message: "comment is too long",
+		}
+	}
+
+	// name
+	if util.LengthOf(name) > 20 {
+		return nil, &Result{
+			code:    INVALID,
+			message: "commenter name is too long",
 		}
 	}
 
 	pageId := domain.NewPageID(strPageId)
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
+		// create new page if not exist
 		page = domain.NewPage(pageId)
 	}
 	u.pageRepository.Add(page)
@@ -72,7 +97,7 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 	u.commenterRepository.Add(commenter)
 	u.commentRepository.Add(comment)
 
-	// デメリットあんまり無さそうなのでコマンドとクエリの責務分離してない
+	// コマンドとクエリの責務分離してないけどデメリットよりメリットが大きいと判断(複数回API叩かなくて良い)
 	return &CommentWithCommenter{comment, commenter}, &Result{code: OK}
 }
 

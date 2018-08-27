@@ -24,3 +24,7 @@ type CommenterRepository interface {
 	Delete(commenterId domain.CommenterID)
 	Get(commenterId domain.CommenterID) *domain.Commenter
 }
+
+type UserRepository interface {
+	GetUser()
+}

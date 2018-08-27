@@ -3,6 +3,7 @@ package usecase_test
 import (
 	"commenting/interface/repository"
 	"commenting/usecase"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/aetest"
 	"strings"
@@ -114,15 +115,11 @@ func TestPostComment(t *testing.T) {
 
 	for _, c := range validCases {
 		_, res := u.PostComment(c.pageId, c.name, c.text)
-		if res.Code() != usecase.OK {
-			t.Errorf("%s: got '%v: %v' want '%v'", c.test, res.Code(), res.Message(), usecase.OK)
-		}
+		assert.Equal(t, usecase.OK, res.Code())
 	}
 
 	for _, c := range invalidCases {
 		_, res := u.PostComment(c.pageId, c.name, c.text)
-		if res.Code() != usecase.ErrInvalid {
-			t.Errorf("%s: got '%v' want '%v'", c.test, res.Code(), usecase.ErrInvalid)
-		}
+		assert.Equal(t, usecase.INVALID, res.Code())
 	}
 }
