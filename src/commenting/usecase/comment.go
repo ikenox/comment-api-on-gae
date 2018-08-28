@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"commenting/domain"
+	"commenting/domain/comment"
 	"commenting/env"
 	"regexp"
 	"util"
@@ -26,8 +26,8 @@ func NewCommentUseCase(
 }
 
 type CommentWithCommenter struct {
-	Comment   *domain.Comment
-	Commenter *domain.Commenter
+	Comment   *comment.Comment
+	Commenter *comment.Commenter
 }
 
 var pageIdRegexp = regexp.MustCompile("^[0-9a-zA-Z_\\-]+$")
@@ -83,15 +83,15 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 		}
 	}
 
-	pageId := domain.NewPageID(strPageId)
+	pageId := comment.NewPageID(strPageId)
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
 		// create new page if not exist
-		page = domain.NewPage(pageId)
+		page = comment.NewPage(pageId)
 	}
 	u.pageRepository.Add(page)
 
-	commenter := domain.NewCommenter(u.commenterRepository.NextCommenterID(), name)
+	commenter := comment.NewCommenter(u.commenterRepository.NextCommenterID(), name)
 	comment := commenter.NewComment(u.commentRepository.NextCommentID(), text, page, env.CurrentTime())
 
 	u.commenterRepository.Add(commenter)
@@ -102,7 +102,7 @@ func (u *CommentUseCase) PostComment(strPageId string, name string, text string)
 }
 
 func (u *CommentUseCase) GetComments(strPageID string) ([]*CommentWithCommenter, *Result) {
-	pageId := domain.NewPageID(strPageID)
+	pageId := comment.NewPageID(strPageID)
 
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
@@ -111,7 +111,7 @@ func (u *CommentUseCase) GetComments(strPageID string) ([]*CommentWithCommenter,
 
 	comments := u.commentRepository.FindByPageID(page.PageId())
 
-	commentIds := make([]domain.CommenterID, len(comments))
+	commentIds := make([]comment.CommenterID, len(comments))
 	for i, c := range comments {
 		commentIds[i] = c.CommenterId()
 	}

@@ -1,4 +1,4 @@
-package domain
+package comment
 
 type PageID string
 

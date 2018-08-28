@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"commenting/domain"
+	"commenting/domain/comment"
 	"commenting/usecase"
 	"context"
 	"google.golang.org/appengine/datastore"
@@ -21,20 +21,20 @@ func NewCommenterRepository(ctx context.Context) usecase.CommenterRepository {
 	}
 }
 
-func (r *commenterRepository) NextCommenterID() domain.CommenterID {
-	return domain.CommenterID(r.nextID())
+func (r *commenterRepository) NextCommenterID() comment.CommenterID {
+	return comment.CommenterID(r.nextID())
 }
 
-func (r *commenterRepository) Add(commenter *domain.Commenter) {
+func (r *commenterRepository) Add(commenter *comment.Commenter) {
 	key, entity := r.toDataStoreEntity(commenter)
 	r.put(key, entity)
 }
 
-func (r *commenterRepository) Delete(id domain.CommenterID) {
+func (r *commenterRepository) Delete(id comment.CommenterID) {
 	r.delete(r.newKey(int64(id), ""))
 }
 
-func (r *commenterRepository) Get(commenterId domain.CommenterID) *domain.Commenter {
+func (r *commenterRepository) Get(commenterId comment.CommenterID) *comment.Commenter {
 	entity := new(commenterEntity)
 	key := r.newKey(int64(commenterId), "")
 	ok := r.get(key, entity)
@@ -44,7 +44,7 @@ func (r *commenterRepository) Get(commenterId domain.CommenterID) *domain.Commen
 	return r.build(key, entity)
 }
 
-func (r *commenterRepository) FindByComments(commenterIds []domain.CommenterID) []*domain.Commenter {
+func (r *commenterRepository) FindByComments(commenterIds []comment.CommenterID) []*comment.Commenter {
 	entities := make([]*commenterEntity, len(commenterIds))
 	keys := make([]*datastore.Key, len(commenterIds))
 	for i, id := range commenterIds {
@@ -52,14 +52,14 @@ func (r *commenterRepository) FindByComments(commenterIds []domain.CommenterID) 
 	}
 	r.getMulti(keys, entities)
 
-	commenters := make([]*domain.Commenter, len(commenterIds))
+	commenters := make([]*comment.Commenter, len(commenterIds))
 	for i, keys := range keys {
-		commenters[i] = domain.NewCommenter(domain.CommenterID(keys.IntID()), entities[i].Name)
+		commenters[i] = comment.NewCommenter(comment.CommenterID(keys.IntID()), entities[i].Name)
 	}
 	return commenters
 }
 
-func (r *commenterRepository) toDataStoreEntity(commenter *domain.Commenter) (*datastore.Key, *commenterEntity) {
+func (r *commenterRepository) toDataStoreEntity(commenter *comment.Commenter) (*datastore.Key, *commenterEntity) {
 	key := r.newKey(int64(commenter.CommenterId()), "")
 	entity := &commenterEntity{
 		Name: commenter.Name(),
@@ -67,6 +67,6 @@ func (r *commenterRepository) toDataStoreEntity(commenter *domain.Commenter) (*d
 	return key, entity
 }
 
-func (r *commenterRepository) build(key *datastore.Key, entity *commenterEntity) *domain.Commenter {
-	return domain.NewCommenter(domain.CommenterID(key.IntID()), entity.Name)
+func (r *commenterRepository) build(key *datastore.Key, entity *commenterEntity) *comment.Commenter {
+	return comment.NewCommenter(comment.CommenterID(key.IntID()), entity.Name)
 }

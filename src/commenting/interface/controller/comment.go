@@ -26,7 +26,7 @@ func (ctl *CommentController) List(c echo.Context) error {
 	data, res := u.GetComments(pageId)
 
 	json := (&presenter.CommentPresenter{}).RenderArray(data)
-	return renderJSON(c, json, res)
+	return presenter.RenderJSON(c, json, res)
 }
 
 func (ctl *CommentController) PostComment(c echo.Context) error {
@@ -50,5 +50,9 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 	data, result := u.PostComment(p.PageId, p.Name, p.Text)
 
 	json := (&presenter.CommentPresenter{}).Render(data)
-	return renderJSON(c, json, result)
+	return presenter.RenderJSON(c, json, result)
+}
+
+func (ctl *CommentController) Delete(c echo.Context) error {
+
 }

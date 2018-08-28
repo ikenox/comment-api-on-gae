@@ -1,20 +1,26 @@
 package repository
 
 import (
-	"commenting/env"
-	"golang.org/x/net/context"
+	"commenting/domain/auth"
+	"commenting/usecase"
+	"context"
+	"google.golang.org/appengine/user"
 )
 
-type FirebaseUserRepository struct {
+type appEngineUserRepository struct {
 	ctx context.Context
 }
 
-func (r *FirebaseUserRepository) GetUser() {
-	env.FirebaseApp.Auth(r.ctx)
+func NewUserRepository(ctx context.Context) usecase.UserRepository {
+	return &appEngineUserRepository{
+		ctx: ctx,
+	}
 }
 
-func NewFirebaseUserRepository(ctx context.Context) (*FirebaseUserRepository, error) {
-	return &FirebaseUserRepository{
-		ctx: ctx,
-	}, nil
+func (r *appEngineUserRepository) CurrentUser() *auth.User {
+	if u := user.Current(r.ctx); u != nil {
+		return auth.NewUser(u.ID)
+	} else {
+		return nil
+	}
 }

@@ -31,6 +31,11 @@ func NewEcho() engine.Handler {
 	pc := controller.NewCommentController()
 	e.GET("/comment", pc.List)
 	e.POST("/comment", pc.PostComment)
+	e.DELETE("/comment/:id", pc.Delete)
+
+	uc := controller.NewUserController()
+	e.POST("/user", uc.Register)
+	e.GET("/user", uc.CurrentUser)
 	return e
 }
 

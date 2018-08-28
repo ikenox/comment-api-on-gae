@@ -1,19 +1,23 @@
-package controller
+package presenter
 
 import (
-	"commenting/interface/presenter"
 	"commenting/usecase"
 	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 )
 
-func renderJSON(c echo.Context, json interface{}, result *usecase.Result) error {
+type responseJson struct {
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+}
+
+func RenderJSON(c echo.Context, json interface{}, result *usecase.Result) error {
 	var status int
 	switch result.Code() {
 	case usecase.OK:
 		status = http.StatusOK
-	case usecase.ErrInvalid:
+	case usecase.INVALID:
 		status = http.StatusBadRequest
 	case usecase.NOTFOUND:
 		status = http.StatusNotFound
@@ -25,6 +29,9 @@ func renderJSON(c echo.Context, json interface{}, result *usecase.Result) error 
 
 	return c.JSON(
 		status,
-		presenter.RenderJson(json, result),
+		&responseJson{
+			Message: result.Message(),
+			Data:    json,
+		},
 	)
 }

@@ -1,30 +1,31 @@
 package usecase
 
 import (
-	"commenting/domain"
+	"commenting/domain/auth"
+	"commenting/domain/comment"
 )
 
 type CommentRepository interface {
-	NextCommentID() domain.CommentID
-	Add(comment *domain.Comment)
-	Delete(comment domain.CommentID)
-	FindByPageID(page domain.PageID) []*domain.Comment
+	NextCommentID() comment.CommentID
+	Add(comment *comment.Comment)
+	Delete(comment comment.CommentID)
+	FindByPageID(page comment.PageID) []*comment.Comment
 }
 
 type PageRepository interface {
-	Add(page *domain.Page)
-	Delete(page domain.PageID)
-	Get(pageId domain.PageID) *domain.Page
+	Add(page *comment.Page)
+	Delete(page comment.PageID)
+	Get(pageId comment.PageID) *comment.Page
 }
 
 type CommenterRepository interface {
-	NextCommenterID() domain.CommenterID
-	FindByComments(commenterIDs []domain.CommenterID) []*domain.Commenter
-	Add(commenter *domain.Commenter)
-	Delete(commenterId domain.CommenterID)
-	Get(commenterId domain.CommenterID) *domain.Commenter
+	NextCommenterID() comment.CommenterID
+	FindByComments(commenterIDs []comment.CommenterID) []*comment.Commenter
+	Add(commenter *comment.Commenter)
+	Delete(commenterId comment.CommenterID)
+	Get(commenterId comment.CommenterID) *comment.Commenter
 }
 
 type UserRepository interface {
-	GetUser()
+	CurrentUser() *auth.User
 }
