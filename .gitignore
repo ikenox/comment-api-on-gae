@@ -14,3 +14,7 @@
 vendor/
 pkg/
 .storage
+
+secrets/*
+
+!.gitkeep
