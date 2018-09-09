@@ -50,7 +50,6 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 	)
 	data, result := u.PostComment(p.TokenID, p.Name, p.PageId, p.Text)
 	pr := &presenter.CommentPresenter{}
-	println(pr)
 	json := pr.Render(data)
 	return presenter.RenderJSON(c, json, result)
 }
