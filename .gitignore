@@ -15,6 +15,6 @@ vendor/
 pkg/
 .storage
 
-secrets/*
+secrets/
 
 !.gitkeep
