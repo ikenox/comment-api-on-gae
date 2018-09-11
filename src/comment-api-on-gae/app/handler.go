@@ -22,10 +22,23 @@ func NewEcho() engine.Handler {
 	e := echo.New()
 
 	e.Use(middleware.Logger())
+
 	e.Use(middleware.Gzip())
+
 	if env.IsProduction {
 		e.Use(middleware.Recover())
 	}
+
+	if env.IsProduction {
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: []string{"https://ikenox.info"},
+		}))
+	} else {
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: []string{"*"},
+		}))
+	}
+
 	e.Use(useAppEngine)
 
 	// TODO routingはどのレイヤの責務？
