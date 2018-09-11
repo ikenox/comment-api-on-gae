@@ -1,4 +1,4 @@
-application: ikenox-info-comment-api
+application: comment-api-dev
 runtime: go
 api_version: go1.8
 version: 1
@@ -9,3 +9,5 @@ handlers:
   - url: /.*
     script: _go_app
     secure: always
+    http_headers:
+      Access-Control-Allow-Origin: *

@@ -1,0 +1,13 @@
+application: ikenox-info-comment-api
+runtime: go
+api_version: go1.8
+version: 1
+
+threadsafe: true
+
+handlers:
+  - url: /.*
+    script: _go_app
+    secure: always
+    http_headers:
+      Access-Control-Allow-Origin: https://ikenox.info
