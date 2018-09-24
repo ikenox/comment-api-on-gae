@@ -38,7 +38,7 @@ func (r *commentRepository) Delete(commentId domain.CommentID) {
 func (r *commentRepository) FindByPageID(pageId domain.PageID) []*domain.Comment {
 	q := r.dao.NewQuery()
 	var commentEntities []commentEntity
-	keys, fuga := q.Filter("PageID =", pageId).GetAll(r.ctx, &commentEntities)
+	keys, fuga := q.Filter("PageID =", pageId).Order("CommentedAt").GetAll(r.ctx, &commentEntities)
 	if fuga != nil {
 		panic(fuga.Error())
 	}
