@@ -26,10 +26,6 @@ func NewEcho() engine.Handler {
 	e.Use(middleware.Gzip())
 
 	if env.IsProduction {
-		e.Use(middleware.Recover())
-	}
-
-	if env.IsProduction {
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins: []string{"https://ikenox.info"},
 		}))
@@ -40,6 +36,10 @@ func NewEcho() engine.Handler {
 	}
 
 	e.Use(useAppEngine)
+
+	if env.IsProduction {
+		e.Use(middleware.Recover())
+	}
 
 	// TODO routingはどのレイヤの責務？
 	pc := controller.NewCommentController()
