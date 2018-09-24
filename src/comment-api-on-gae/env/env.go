@@ -42,7 +42,5 @@ func init() {
 		panic(err.Error())
 	}
 
-	// dev or prod
-	// https://cloud.google.com/appengine/docs/standard/python/tools/using-local-server#detecting_application_runtime_environment
-	IsProduction = os.Getenv("IS_PRODUCTION") == "true"
+	IsProduction = os.Getenv("IS_PRODUCTION") == "True"
 }
