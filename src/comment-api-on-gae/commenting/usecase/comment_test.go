@@ -115,12 +115,12 @@ func TestPostComment(t *testing.T) {
 	}
 
 	for _, c := range validCases {
-		_, res := u.PostComment(c.pageId, c.name, c.text)
+		_, res := u.PostComment("",c.pageId, c.name, c.text)
 		assert.Equal(t, common_usecase.OK, res.Code())
 	}
 
 	for _, c := range invalidCases {
-		_, res := u.PostComment(c.pageId, c.name, c.text)
+		_, res := u.PostComment("",c.pageId, c.name, c.text)
 		assert.Equal(t, common_usecase.INVALID, res.Code())
 	}
 }

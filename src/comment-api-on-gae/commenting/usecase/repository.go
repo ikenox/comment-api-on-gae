@@ -22,5 +22,4 @@ type CommenterRepository interface {
 	FindByCommenterID(userIDs []domain.CommenterID) []*domain.Commenter
 	CurrentCommenter(idToken string) *domain.Commenter
 	Put(commenter *domain.Commenter)
-	Get(userID domain.UserID) *domain.Commenter
 }

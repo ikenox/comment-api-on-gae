@@ -34,7 +34,7 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 		PageId  string `json:"pageId"`
 		Name    string `json:"name"`
 		Text    string `json:"text"`
-		TokenID string `json:"tokenId"`
+		IDToken string `json:"idToken"`
 	}{}
 	if err := c.Bind(p); err != nil {
 		// 変換エラーはinterface adapter層における異常系
@@ -48,7 +48,7 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 		repository.NewCommenterRepository(ctx),
 		repository.NewPageRepository(ctx),
 	)
-	data, result := u.PostComment(p.TokenID, p.Name, p.PageId, p.Text)
+	data, result := u.PostComment(p.IDToken, p.Name, p.PageId, p.Text)
 	pr := &presenter.CommentPresenter{}
 	json := pr.Render(data)
 	return presenter.RenderJSON(c, json, result)
