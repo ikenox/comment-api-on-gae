@@ -10,3 +10,7 @@ handlers:
   - url: /.*
     script: _go_app
     secure: always
+
+env_variables:
+  FIREBASE_SERVICE_ACCOUNT_PATH: ./secrets/ikenox-info-comment-api-firebase-adminsdk-itci4-016855d567.json
+  IS_PRODUCTION: true

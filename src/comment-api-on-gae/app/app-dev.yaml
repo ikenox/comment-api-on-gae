@@ -10,3 +10,8 @@ handlers:
   - url: /.*
     script: _go_app
     secure: always
+
+env_variables:
+  FIREBASE_SERVICE_ACCOUNT_PATH: ./secrets/comment-api-dev.json
+  IS_PRODUCTION: false
+

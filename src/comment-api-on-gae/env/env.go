@@ -6,7 +6,6 @@ import (
 	"google.golang.org/api/option"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 )
 
@@ -32,7 +31,7 @@ func init() {
 	}
 
 	// firebase
-	path, err := filepath.Abs("./secrets/comment-api-dev.json")
+	path, err := filepath.Abs(os.Getenv("FIREBASE_SERVICE_ACCOUNT_PATH"))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -45,5 +44,5 @@ func init() {
 
 	// dev or prod
 	// https://cloud.google.com/appengine/docs/standard/python/tools/using-local-server#detecting_application_runtime_environment
-	IsProduction = strings.HasPrefix(os.Getenv("SERVER_SOFTWARE"), "Google App Engine/")
+	IsProduction = os.Getenv("IS_PRODUCTION") == "true"
 }
