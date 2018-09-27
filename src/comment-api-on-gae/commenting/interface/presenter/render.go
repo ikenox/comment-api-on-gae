@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
+	"time"
 )
 
 type responseJson struct {
@@ -34,4 +35,17 @@ func RenderJSON(c echo.Context, json interface{}, result *usecase.Result) error 
 			Data:    json,
 		},
 	)
+}
+
+type jsonTime struct {
+	time.Time
+}
+
+func (j jsonTime) format() string {
+  return j.Time.UTC().Format("2006-01-02T15:04:05-07:00")
+}
+
+// MarshalJSON() の実装
+func (j jsonTime) MarshalJSON() ([]byte, error) {
+  return []byte(`"` + j.format() + `"`), nil
 }

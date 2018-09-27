@@ -2,7 +2,6 @@ package presenter
 
 import (
 	"comment-api-on-gae/commenting/usecase"
-	"time"
 )
 
 type commentWithCommenter struct {
@@ -14,7 +13,7 @@ type comment struct {
 	CommentId   int64     `json:"commentId"`
 	PageId      string    `json:"pageId"`
 	Text        string    `json:"text"`
-	CommentedAt time.Time `json:"commentedAt"`
+	CommentedAt jsonTime `json:"commentedAt"`
 }
 
 type commenter struct {
@@ -40,7 +39,7 @@ func (p *CommentPresenter) Render(d *usecase.CommentWithCommenter) *commentWithC
 			CommentId:   int64(d.Comment.CommentID()),
 			PageId:      string(d.Comment.PageID()),
 			Text:        d.Comment.Text(),
-			CommentedAt: d.Comment.CommentedAt(),
+			CommentedAt: jsonTime{d.Comment.CommentedAt()},
 		}
 	}
 	if d.Commenter != nil {
