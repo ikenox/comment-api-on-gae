@@ -37,10 +37,6 @@ func NewEcho() engine.Handler {
 
 	e.Use(useAppEngine)
 
-	if env.IsProduction {
-		e.Use(middleware.Recover())
-	}
-
 	// TODO routingはどのレイヤの責務？
 	pc := controller.NewCommentController()
 	e.GET("/comment", pc.List)
