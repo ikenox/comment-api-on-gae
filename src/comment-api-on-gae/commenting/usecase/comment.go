@@ -44,21 +44,21 @@ func (u *CommentUseCase) PostComment(idToken string, name string, strPageId stri
 
 	// pageId
 	if strPageId == "" {
-		return nil, usecase.NewResult(usecase.INVALID, "PageID must not be empty")
+		return nil, usecase.NewResult(usecase.INVALID, "page id must not be empty.")
 	}
 	if strPageId = pageIdRegexp.Copy().FindString(strPageId); strPageId == "" {
-		return nil, usecase.NewResult(usecase.INVALID, "invalid character")
+		return nil, usecase.NewResult(usecase.INVALID, "page id contains invalid character.")
 	}
 	if len(strPageId) > 64 {
-		return nil, usecase.NewResult(usecase.INVALID, "page ID is too long")
+		return nil, usecase.NewResult(usecase.INVALID, "page id is too long.")
 	}
 
 	// text
 	if text == "" {
-		return nil, usecase.NewResult(usecase.INVALID, "comment must not be empty")
+		return nil, usecase.NewResult(usecase.INVALID, "comment must not be empty.")
 	}
 	if util.LengthOf(text) > 1000 {
-		return nil, usecase.NewResult(usecase.INVALID, "comment is too long")
+		return nil, usecase.NewResult(usecase.INVALID, "comment should be less than 1000 characters.")
 	}
 
 	pageId := domain.NewPageID(strPageId)
@@ -72,8 +72,12 @@ func (u *CommentUseCase) PostComment(idToken string, name string, strPageId stri
 	commenter := u.commenterRepository.CurrentCommenter(idToken)
 	if commenter == nil {
 		// name
+		if name == "" {
+			return nil, usecase.NewResult(usecase.INVALID, "name must not be empty.")
+		}
+
 		if util.LengthOf(name) > 20 {
-			return nil, usecase.NewResult(usecase.INVALID, "commenter name is too long")
+			return nil, usecase.NewResult(usecase.INVALID, "name should be less than 20 characters.")
 		}
 		commenter = domain.NewCommenter(u.commenterRepository.NextCommenterID(), name, "")
 		u.commenterRepository.Put(commenter)

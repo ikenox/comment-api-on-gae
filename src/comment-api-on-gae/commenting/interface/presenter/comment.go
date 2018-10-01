@@ -34,6 +34,9 @@ func (p *CommentPresenter) RenderArray(d []*usecase.CommentWithCommenter) []*com
 
 func (p *CommentPresenter) Render(d *usecase.CommentWithCommenter) *commentWithCommenter {
 	obj := &commentWithCommenter{}
+	if d == nil {
+		return nil
+	}
 	if d.Comment != nil {
 		obj.Comment = &comment{
 			CommentId:   int64(d.Comment.CommentID()),
