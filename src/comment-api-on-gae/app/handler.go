@@ -21,6 +21,10 @@ func NewServer() http.Handler {
 func NewEcho() engine.Handler {
 	e := echo.New()
 
+	if env.IsProduction {
+		e.Use(middleware.Recover())
+	}
+
 	e.Use(middleware.Logger())
 
 	e.Use(middleware.Gzip())
@@ -36,10 +40,6 @@ func NewEcho() engine.Handler {
 	}
 
 	e.Use(useAppEngine)
-
-	if env.IsProduction {
-		e.Use(middleware.Recover())
-	}
 
 	// TODO routingはどのレイヤの責務？
 	pc := controller.NewCommentController()
