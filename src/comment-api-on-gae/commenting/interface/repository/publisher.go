@@ -27,9 +27,9 @@ func (p *EventPublisher) Publish(topicID string, message string) {
 		panic(err.Error())
 	}
 
-	result := t.Publish(p.ctx, &pubsub.Message{Data: []byte( message )})
-	_, err = result.Get(p.ctx)
-	if err != nil {
-		panic(err.Error())
-	}
+	t.Publish(p.ctx, &pubsub.Message{Data: []byte( message )})
+	//_, err = result.Get(p.ctx)
+	//if err != nil {
+	//	panic(err.Error())
+	//}
 }
