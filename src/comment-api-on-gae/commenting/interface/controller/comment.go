@@ -36,13 +36,14 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 		PageId  string `json:"pageId"`
 		Name    string `json:"name"`
 		Text    string `json:"text"`
-		IDToken string `json:"idToken"`
 	}{}
 	if err := c.Bind(p); err != nil {
 		// 変換エラーはinterface adapter層における異常系
 		// usecaseでのエラーはinterface adapterにとっては正常系
 		return err
 	}
+
+	IDToken := c.Request().Header().Get("IdToken")
 
 	ctx := c.StdContext()
 	u := usecase.NewCommentUseCase(
@@ -52,23 +53,15 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 		repository.NewPublisher(ctx),
 		repository.NewLoggingRepository(ctx),
 	)
-	data, result := u.PostComment(p.IDToken, p.Name, p.PageId, p.Text)
+	data, result := u.PostComment(IDToken, p.Name, p.PageId, p.Text)
 	pr := &presenter.CommentPresenter{}
 	json := pr.Render(data)
 	return presenter.RenderJSON(c, json, result)
 }
 
 func (ctl *CommentController) Delete(c echo.Context) error {
-	pageID := c.Param("pageId")
-	var p = &struct {
-		// TODO tokenはcookieで渡してもらうほうが良さそう
-		IDToken string `json:"idToken"`
-	}{}
-	if err := c.Bind(p); err != nil {
-		// 変換エラーはinterface adapter層における異常系
-		// usecaseでのエラーはinterface adapterにとっては正常系
-		return err
-	}
+	commentID := c.Param("id")
+	IDToken := c.Request().Header().Get("IdToken")
 
 	ctx := c.StdContext()
 	u := usecase.NewCommentUseCase(
@@ -78,6 +71,6 @@ func (ctl *CommentController) Delete(c echo.Context) error {
 		repository.NewPublisher(ctx),
 		repository.NewLoggingRepository(ctx),
 	)
-	result := u.DeleteComment(p.IDToken, pageID)
+	result := u.DeleteComment(IDToken, commentID)
 	return presenter.RenderJSON(c, nil, result)
 }
