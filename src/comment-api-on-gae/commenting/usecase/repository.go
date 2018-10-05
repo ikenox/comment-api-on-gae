@@ -6,8 +6,9 @@ import (
 
 type CommentRepository interface {
 	NextCommentID() domain.CommentID
+	Get(pageId domain.CommentID) *domain.Comment
 	Put(comment *domain.Comment)
-	Delete(comment domain.CommentID)
+	Delete(commentID domain.CommentID)
 	FindByPageID(page domain.PageID) []*domain.Comment
 }
 
@@ -20,6 +21,14 @@ type PageRepository interface {
 type CommenterRepository interface {
 	NextCommenterID() domain.CommenterID
 	FindByCommenterID(userIDs []domain.CommenterID) []*domain.Commenter
-	CurrentCommenter(idToken string) *domain.Commenter
+	CurrentUser(idToken string) domain.UserID
 	Put(commenter *domain.Commenter)
+}
+
+type EventPublisher interface {
+	Publish(topicID string, message string)
+}
+
+type LoggingRepository interface {
+	Infof(format string, args ...interface{})
 }

@@ -12,6 +12,6 @@ handlers:
     secure: always
 
 env_variables:
-  FIREBASE_SERVICE_ACCOUNT_PATH: ./secrets/comment-api-dev.json
+  SERVICE_ACCOUNT_PATH: ./secrets/comment-api-dev-9162d86d5ce8.json
   IS_PRODUCTION: false
 

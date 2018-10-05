@@ -26,6 +26,16 @@ func (r *commentRepository) NextCommentID() domain.CommentID {
 	return domain.CommentID(r.dao.NextID())
 }
 
+func (r *commentRepository) Get(commentID domain.CommentID) *domain.Comment{
+	key := r.dao.NewKey(int64(commentID), "")
+	entity := &commentEntity{}
+	if ok := r.dao.Get(key, entity);ok{
+		return r.build(key, entity)
+	}else{
+		return nil
+	}
+}
+
 func (r *commentRepository) Put(comment *domain.Comment) {
 	key, entity := r.toDataStoreEntity(comment)
 	r.dao.Put(key, entity)

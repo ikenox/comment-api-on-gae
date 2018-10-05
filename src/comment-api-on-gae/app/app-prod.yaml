@@ -12,5 +12,5 @@ handlers:
     secure: always
 
 env_variables:
-  FIREBASE_SERVICE_ACCOUNT_PATH: ./secrets/ikenox-info-comment-api-firebase-adminsdk-itci4-016855d567.json
+  SERVICE_ACCOUNT_PATH: ./secrets/ikenox-info-comment-api-75b6f4b1fb2f.json
   IS_PRODUCTION: true

@@ -56,21 +56,13 @@ func (r *commenterRepository) FindByCommenterID(commenterIDs []domain.CommenterI
 	return commenters
 }
 
-func (r *commenterRepository) CurrentCommenter(idToken string) *domain.Commenter {
+// TODO UserRepositoryに移動
+func (r *commenterRepository) CurrentUser(idToken string) domain.UserID {
 	token, err := r.authCli.VerifyIDToken(r.ctx, idToken)
 	if err != nil {
-		return nil
+		return ""
 	}
-	userID := domain.UserID(token.UID)
-
-	// todo repositoryがロジック持ってる
-	// userIDの扱いがなにかおかしいかも
-	commenter := r.getByUserID(userID)
-	if commenter == nil {
-		commenter = domain.NewCommenter(r.NextCommenterID(), "", userID)
-		r.Put(commenter)
-	}
-	return commenter
+	return domain.UserID(token.UID)
 }
 
 func (r *commenterRepository) getByUserID(userID domain.UserID) *domain.Commenter {

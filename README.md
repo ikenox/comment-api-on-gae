@@ -44,3 +44,10 @@ $ GOPATH=/path/to/comment-api-on-gae dev_appserver.py app --enable_watching_go_p
 # /path/to/comment-api-on-gae/src/commenting
 $ GOPATH=/path/to/comment-api-on-gae goapp deploy app
 ```
+
+## Setup cloud services
+
+### Firebase
+
+### Google cloud pubsub
+

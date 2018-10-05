@@ -3,6 +3,9 @@ package usecase
 import (
 	"comment-api-on-gae/commenting/domain"
 	"comment-api-on-gae/common/usecase"
+	"fmt"
+	"strconv"
+
 	"comment-api-on-gae/env"
 	"comment-api-on-gae/util"
 	"regexp"
@@ -12,17 +15,23 @@ type CommentUseCase struct {
 	commentRepository   CommentRepository
 	commenterRepository CommenterRepository
 	pageRepository      PageRepository
+	publisher           EventPublisher
+	log                 LoggingRepository
 }
 
 func NewCommentUseCase(
 	commentRepo CommentRepository,
 	commenterRepo CommenterRepository,
 	pageRepo PageRepository,
+	publisher EventPublisher,
+	log LoggingRepository,
 ) *CommentUseCase {
 	return &CommentUseCase{
 		commentRepository:   commentRepo,
 		commenterRepository: commenterRepo,
 		pageRepository:      pageRepo,
+		publisher:           publisher,
+		log:                 log,
 	}
 }
 
@@ -69,22 +78,25 @@ func (u *CommentUseCase) PostComment(idToken string, name string, strPageId stri
 	}
 	u.pageRepository.Add(page)
 
-	commenter := u.commenterRepository.CurrentCommenter(idToken)
-	if commenter == nil {
-		// name
-		if name == "" {
-			return nil, usecase.NewResult(usecase.INVALID, "name must not be empty.")
-		}
-
-		if util.LengthOf(name) > 20 {
-			return nil, usecase.NewResult(usecase.INVALID, "name should be less than 20 characters.")
-		}
-		commenter = domain.NewCommenter(u.commenterRepository.NextCommenterID(), name, "")
-		u.commenterRepository.Put(commenter)
+	userID := u.commenterRepository.CurrentUser(idToken)
+	// name
+	if name == "" {
+		return nil, usecase.NewResult(usecase.INVALID, "name must not be empty.")
 	}
-	comment := commenter.MakeComment(u.commentRepository.NextCommentID(), text, page, env.CurrentTime())
 
+	if util.LengthOf(name) > 20 {
+		return nil, usecase.NewResult(usecase.INVALID, "name should be less than 20 characters.")
+	}
+	commenter := domain.NewCommenter(u.commenterRepository.NextCommenterID(), name, userID)
+	u.commenterRepository.Put(commenter)
+
+	comment := commenter.MakeComment(u.commentRepository.NextCommentID(), text, page, env.CurrentTime())
 	u.commentRepository.Put(comment)
+
+	// TODO イベントpublish部分の実装やインターフェースが雑
+	// TODO 実践ドメイン駆動設計ではドメイン層からpublishしているがどうすべきか
+	u.publisher.Publish("CommentPosted", fmt.Sprintf("name:%s;comment:%s;", name, text))
+	u.log.Infof("label:CommentPosted,name:%s,comment:%s", name, text)
 
 	return &CommentWithCommenter{comment, commenter}, usecase.NewResult(usecase.OK, "")
 }
@@ -116,4 +128,26 @@ func (u *CommentUseCase) GetComments(strPageID string) ([]*CommentWithCommenter,
 	}
 
 	return data, usecase.NewResult(usecase.OK, "")
+}
+
+func (u *CommentUseCase) DeleteComment(idToken string, commentIDStr string) *usecase.Result {
+	userID := u.commenterRepository.CurrentUser(idToken)
+	if userID == "" {
+		return usecase.NewResult(usecase.INVALID, "login required.")
+	}
+
+	commentIDInt, err := strconv.ParseInt(commentIDStr, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	commentID := domain.CommentID(commentIDInt)
+	comment := u.commentRepository.Get(commentID)
+	//if userID != comment.commenter.userID {
+	if comment != nil {
+		return usecase.NewResult(usecase.INVALID, "not allowed.")
+	}
+
+	u.commentRepository.Delete(commentID)
+
+	return usecase.NewResult(usecase.OK, "")
 }

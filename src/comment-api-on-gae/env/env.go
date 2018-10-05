@@ -11,14 +11,21 @@ import (
 
 // application globals
 // アプリにとって普遍とみなせる値や関数、環境変数など？
-// レイヤ関係なく使われるような普遍的な値や概念はRepositoryにするよりグローバル変数にしてしまったほうが良さそう
+// レイヤ関係なく使われるような普遍的な値や概念はRepositoryにするよりグローバル変数にしてしまったほうが楽そう
 var Namespace string
 var CurrentTime func() time.Time
 var IsProduction bool
 var FirebaseApp *firebase.App
+var GCPCredentialOption option.ClientOption
+var ProjectId string
 
 func init() {
 	ctx := context.Background()
+
+	// FIXME
+	ProjectId = "comment-api-dev"
+
+	IsProduction = os.Getenv("IS_PRODUCTION") == "True"
 
 	// time
 	CurrentTime = time.Now
@@ -30,17 +37,16 @@ func init() {
 		Namespace = "default"
 	}
 
-	// firebase
-	path, err := filepath.Abs(os.Getenv("FIREBASE_SERVICE_ACCOUNT_PATH"))
+	path, err := filepath.Abs(os.Getenv("SERVICE_ACCOUNT_PATH"))
 	if err != nil {
 		panic(err.Error())
 	}
-	opt := option.WithCredentialsFile(path)
-	if app, err := firebase.NewApp(ctx, nil, opt); err == nil {
-		FirebaseApp = app
-	} else {
+	GCPCredentialOption = option.WithCredentialsFile(path)
+
+	// FIXME クライアント郡がenvにいるのはおかしいので、optionだけenvに残して移動
+
+	// firebase
+	if FirebaseApp, err = firebase.NewApp(ctx, nil, GCPCredentialOption); err != nil {
 		panic(err.Error())
 	}
-
-	IsProduction = os.Getenv("IS_PRODUCTION") == "True"
 }

@@ -22,6 +22,8 @@ func (ctl *CommentController) List(c echo.Context) error {
 		repository.NewCommentRepository(ctx),
 		repository.NewCommenterRepository(ctx),
 		repository.NewPageRepository(ctx),
+		repository.NewPublisher(ctx),
+		repository.NewLoggingRepository(ctx),
 	)
 	data, res := u.GetComments(pageId)
 
@@ -47,6 +49,8 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 		repository.NewCommentRepository(ctx),
 		repository.NewCommenterRepository(ctx),
 		repository.NewPageRepository(ctx),
+		repository.NewPublisher(ctx),
+		repository.NewLoggingRepository(ctx),
 	)
 	data, result := u.PostComment(p.IDToken, p.Name, p.PageId, p.Text)
 	pr := &presenter.CommentPresenter{}
@@ -55,5 +59,25 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 }
 
 func (ctl *CommentController) Delete(c echo.Context) error {
-	panic("implement me")
+	pageID := c.Param("pageId")
+	var p = &struct {
+		// TODO tokenはcookieで渡してもらうほうが良さそう
+		IDToken string `json:"idToken"`
+	}{}
+	if err := c.Bind(p); err != nil {
+		// 変換エラーはinterface adapter層における異常系
+		// usecaseでのエラーはinterface adapterにとっては正常系
+		return err
+	}
+
+	ctx := c.StdContext()
+	u := usecase.NewCommentUseCase(
+		repository.NewCommentRepository(ctx),
+		repository.NewCommenterRepository(ctx),
+		repository.NewPageRepository(ctx),
+		repository.NewPublisher(ctx),
+		repository.NewLoggingRepository(ctx),
+	)
+	result := u.DeleteComment(p.IDToken, pageID)
+	return presenter.RenderJSON(c, nil, result)
 }
