@@ -46,6 +46,9 @@ func NewEcho() engine.Handler {
 	e.GET("/comment", pc.List)
 	e.POST("/comment", pc.PostComment)
 	e.DELETE("/comment/:id", pc.Delete)
+
+	ec := controller.NewDomainEventController()
+	e.POST("/_ah/push-handlers/domain-event", ec.Dispatch)
 	return e
 }
 

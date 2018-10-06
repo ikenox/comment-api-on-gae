@@ -47,7 +47,24 @@ $ GOPATH=/path/to/comment-api-on-gae goapp deploy app
 
 ## Setup cloud services
 
+### Google App Engine
+
+- create index
+- issue service account
+   - firebase data manager
+   - pubsub publisher/subscriber
+
 ### Firebase
+
+- enable anonymous login
 
 ### Google cloud pubsub
 
+- create topic
+
+gcloud beta pubsub topics create CommentPosted
+gcloud beta pubsub subscriptions create comment-api-domain-event \
+    --topic domain-event \
+    --push-endpoint \
+    https://YOUR_PROJECT_ID.appspot.com/_ah/push-handlers/domain-event \
+    --ack-deadline 10

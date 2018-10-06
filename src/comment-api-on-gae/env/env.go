@@ -17,13 +17,13 @@ var CurrentTime func() time.Time
 var IsProduction bool
 var FirebaseApp *firebase.App
 var GCPCredentialOption option.ClientOption
-var ProjectId string
+var ProjectID string
 
 func init() {
 	ctx := context.Background()
 
 	// FIXME
-	ProjectId = "comment-api-dev"
+	ProjectID = "comment-api-dev"
 
 	IsProduction = os.Getenv("IS_PRODUCTION") == "True"
 

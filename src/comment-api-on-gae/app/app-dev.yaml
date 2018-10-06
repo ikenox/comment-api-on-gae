@@ -7,6 +7,9 @@ module: default
 threadsafe: true
 
 handlers:
+  - url: /_ah/push-handlers/.*
+    script: main.APPLICATION
+#    login: admin
   - url: /.*
     script: _go_app
     secure: always

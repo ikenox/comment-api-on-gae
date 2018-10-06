@@ -23,7 +23,7 @@ type CommenterRepository interface {
 }
 
 type EventPublisher interface {
-	Publish(topicID string, message string)
+	Publish(event string, src interface{})
 }
 
 type LoggingRepository interface {

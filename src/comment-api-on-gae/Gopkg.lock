@@ -263,6 +263,7 @@
     "internal/base",
     "internal/datastore",
     "internal/log",
+    "internal/mail",
     "internal/memcache",
     "internal/modules",
     "internal/remote_api",
@@ -270,6 +271,7 @@
     "internal/urlfetch",
     "internal/user",
     "log",
+    "mail",
     "memcache",
     "socket",
     "urlfetch",
@@ -330,6 +332,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7e012a87e0fa246f89fa54d011378b7d4882ea8d4a182d2c920329076d9f2628"
+  inputs-digest = "2f866a757cc725974a5675f09c9839ee8dc518c792c034802ab38c85f4802e8f"
   solver-name = "gps-cdcl"
   solver-version = 1

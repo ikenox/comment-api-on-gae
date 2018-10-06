@@ -3,7 +3,6 @@ package usecase
 import (
 	"comment-api-on-gae/commenting/domain"
 	"comment-api-on-gae/common/usecase"
-	"fmt"
 	"strconv"
 
 	"comment-api-on-gae/env"
@@ -88,8 +87,18 @@ func (u *CommentUseCase) PostComment(idToken string, name string, strPageId stri
 
 	// TODO イベントpublish部分の実装やインターフェースが雑
 	// TODO 実践ドメイン駆動設計ではドメイン層からpublishしているがどうすべきか
-	u.publisher.Publish("CommentPosted", fmt.Sprintf("name:%s;comment:%s;", name, text))
-	// TODO アプリケーションログのフォーマット
+	// TODO きちんとイベントタイプごとにstructを定義
+	u.publisher.Publish("CommentPosted", struct {
+		// TODO jsonへのマッピングはinterface層の責務？
+		CommentID int64  `json:"commentId"`
+		Name      string `json:"name"`
+		Text      string `json:"text"`
+	}{
+		CommentID: int64(comment.CommentID()),
+		Name:      comment.Name(),
+		Text:      comment.Text(),
+	})
+	// TODO アプリケーションログのフォーマットのベタープラクティス
 	u.log.Infof("label:CommentPosted,name:%s,comment:%s", name, text)
 
 	return comment, usecase.NewResult(usecase.OK, "")
@@ -123,6 +132,16 @@ func (u *CommentUseCase) DeleteComment(idToken string, commentIDStr string) *use
 		return usecase.NewResult(usecase.INVALID, "not allowed.")
 	}
 	u.commentRepository.Delete(commentID)
+
+	u.publisher.Publish("CommentDeleted", struct {
+		CommentID int64  `json:"commentId"`
+		Name      string `json:"name"`
+		Text      string `json:"text"`
+	}{
+		CommentID: int64(comment.CommentID()),
+		Name:      comment.Name(),
+		Text:      comment.Text(),
+	})
 
 	return usecase.NewResult(usecase.OK, "")
 }
