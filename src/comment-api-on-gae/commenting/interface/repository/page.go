@@ -5,7 +5,6 @@ import (
 	"comment-api-on-gae/commenting/usecase"
 	"comment-api-on-gae/common/infra"
 	"context"
-	"google.golang.org/appengine/datastore"
 )
 
 type pageRepository struct {
@@ -19,34 +18,33 @@ func NewPageRepository(ctx context.Context) usecase.PageRepository {
 }
 
 func (r *pageRepository) Add(page *domain.Page) {
-	key, entity := r.toDataStoreEntity(page)
-	r.dao.Put(key, entity)
+	r.dao.Put(&pageEntity{
+		_kind:  r.dao.Kind(),
+		PageID: string(page.PageID()),
+	})
 }
 
 func (r *pageRepository) Delete(id domain.PageID) {
-	r.dao.Delete(r.dao.NewKey(0, string(id)))
+	r.dao.Delete(r.dao.NewKey(string(id), 0, nil))
 }
 
 func (r *pageRepository) Get(id domain.PageID) *domain.Page {
-	entity := new(pageEntity)
-	key := r.dao.NewKey(0, string(id))
-	ok := r.dao.Get(key, entity)
+	entity := &pageEntity{
+		_kind: r.dao.Kind(),
+		PageID:string(id),
+	}
+	ok := r.dao.Get(entity)
 	if !ok {
 		return nil
 	}
-	return r.build(key, entity)
+	return r.build(entity)
 }
 
-type pageEntity struct{}
-
-// TODO: repositoryが持ってんのなんか変
-// presetnerに寄ってるのが正しい姿？
-func (r *pageRepository) toDataStoreEntity(page *domain.Page) (*datastore.Key, *pageEntity) {
-	key := r.dao.NewKey(0, string(page.PageId()))
-	entity := &pageEntity{}
-	return key, entity
+type pageEntity struct {
+	_kind  string `goon:"kind,U"`
+	PageID string `datastore:"-" goon:"id"`
 }
 
-func (r *pageRepository) build(key *datastore.Key, entity *pageEntity) *domain.Page {
-	return domain.NewPage(domain.PageID(key.StringID()))
+func (r *pageRepository) build(entity *pageEntity) *domain.Page {
+	return domain.NewPage(domain.PageID(entity.PageID))
 }

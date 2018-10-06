@@ -19,10 +19,7 @@ type PageRepository interface {
 }
 
 type CommenterRepository interface {
-	NextCommenterID() domain.CommenterID
-	FindByCommenterID(userIDs []domain.CommenterID) []*domain.Commenter
-	CurrentUser(idToken string) domain.UserID
-	Put(commenter *domain.Commenter)
+	CurrentCommenter(idToken string) *domain.Commenter
 }
 
 type EventPublisher interface {

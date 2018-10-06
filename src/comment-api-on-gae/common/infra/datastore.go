@@ -2,6 +2,7 @@ package infra
 
 import (
 	"context"
+	"github.com/mjibson/goon"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 )
@@ -11,50 +12,53 @@ import (
 type DataStoreDAO struct {
 	ctx  context.Context
 	kind string
+	g    *goon.Goon
+}
+
+func (d *DataStoreDAO) Kind() string {
+	return d.kind
 }
 
 func NewDataStoreDAO(ctx context.Context, kind string) *DataStoreDAO {
 	return &DataStoreDAO{
 		ctx:  ctx,
+		g:    goon.FromContext(ctx),
 		kind: kind,
 	}
 }
+func (d *DataStoreDAO) NewKey(stringID string, intID int64, parent *datastore.Key) *datastore.Key {
+	return datastore.NewKey(d.ctx, d.kind, stringID, intID, parent)
+}
 
-func (r *DataStoreDAO) NextID() int64 {
-	low, _, err := datastore.AllocateIDs(r.ctx, r.kind, nil, 1)
+func (d *DataStoreDAO) NextID() int64 {
+	low, _, err := datastore.AllocateIDs(d.ctx, d.kind, nil, 1)
 	if err != nil {
 		panic(err.Error())
 	}
 	return low
 }
 
-func (r *DataStoreDAO) NewKey(intId int64, stringId string) *datastore.Key {
-	return datastore.NewKey(r.ctx, r.kind, stringId, intId, nil)
-}
-
-// エラーは基本的にpanicしている
-// 必要に応じてリトライ機構とかつけてもよいが基本infra層のエラーはinfra層内で片付けたほうがほかの層がややこしくならない
-// infra層のエラーがアプリ要件に絡んでくるようなら頑張ってerror返す？
-func (r *DataStoreDAO) Delete(key *datastore.Key) {
-	err := datastore.Delete(r.ctx, key)
+// TODO エラー時にリトライなどさせるべきか
+func (d *DataStoreDAO) Delete(key *datastore.Key) {
+	err := d.g.Delete(key)
 	if err != nil {
 		panic(err.Error())
 	}
 }
 
-func (r *DataStoreDAO) Put(key *datastore.Key, src interface{}) *datastore.Key {
-	key, err := datastore.Put(r.ctx, key, src)
+func (d *DataStoreDAO) Put(src interface{}) *datastore.Key {
+	key, err := d.g.Put(src)
 	if err != nil {
 		panic(err.Error())
 	}
 	return key
 }
 
-func (r *DataStoreDAO) GetMulti(keys []*datastore.Key, src interface{}) {
+func (d *DataStoreDAO) GetMulti(keys []*datastore.Key, src interface{}) {
 	if len(keys) == 0 {
 		return
 	}
-	err := datastore.GetMulti(r.ctx, keys, src)
+	err := datastore.GetMulti(d.ctx, keys, src)
 	if err == nil {
 		return
 	}
@@ -74,8 +78,12 @@ func (r *DataStoreDAO) GetMulti(keys []*datastore.Key, src interface{}) {
 	}
 }
 
-func (r *DataStoreDAO) Get(key *datastore.Key, src interface{}) (ok bool) {
-	err := datastore.Get(r.ctx, key, src)
+func (d *DataStoreDAO) GetAll(q *datastore.Query, list interface{}) ([]*datastore.Key, error) {
+	return d.g.GetAll(q, list)
+}
+
+func (d *DataStoreDAO) Get(src interface{}) (ok bool) {
+	err := d.g.Get(src)
 	if err == nil {
 		return true
 	} else if err == datastore.ErrNoSuchEntity {
@@ -85,6 +93,6 @@ func (r *DataStoreDAO) Get(key *datastore.Key, src interface{}) (ok bool) {
 	}
 }
 
-func (r *DataStoreDAO) NewQuery() *datastore.Query {
-	return datastore.NewQuery(r.kind)
+func (d *DataStoreDAO) NewQuery() *datastore.Query {
+	return datastore.NewQuery(d.kind)
 }

@@ -25,9 +25,14 @@ func (ctl *CommentController) List(c echo.Context) error {
 		repository.NewPublisher(ctx),
 		repository.NewLoggingRepository(ctx),
 	)
-	data, res := u.GetComments(pageId)
+	comments, res := u.GetComments(pageId)
 
-	json := (&presenter.CommentPresenter{}).RenderArray(data)
+	pr := &presenter.CommentPresenter{}
+	json := make([]interface{}, len(comments))
+    for i, comment := range comments {
+        json[i] = pr.Render(comment)
+    }
+
 	return presenter.RenderJSON(c, json, res)
 }
 

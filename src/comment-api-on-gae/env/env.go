@@ -34,7 +34,7 @@ func init() {
 	if ns := os.Getenv("NAMESPACE"); ns != "" {
 		Namespace = ns
 	} else {
-		Namespace = "default"
+		Namespace = ""
 	}
 
 	path, err := filepath.Abs(os.Getenv("SERVICE_ACCOUNT_PATH"))

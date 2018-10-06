@@ -120,6 +120,12 @@
   version = "v0.0.3"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/mjibson/goon"
+  packages = ["."]
+  revision = "0c01b4bc4f4970fa6f91409bf7f134a10809219c"
+
+[[projects]]
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
@@ -257,12 +263,14 @@
     "internal/base",
     "internal/datastore",
     "internal/log",
+    "internal/memcache",
     "internal/modules",
     "internal/remote_api",
     "internal/socket",
     "internal/urlfetch",
     "internal/user",
     "log",
+    "memcache",
     "socket",
     "urlfetch",
     "user"
@@ -322,6 +330,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bdc6f09bd65d0e9e843e47de21954fa84da13c9fe352be4a19b7a77e7c0afd96"
+  inputs-digest = "7e012a87e0fa246f89fa54d011378b7d4882ea8d4a182d2c920329076d9f2628"
   solver-name = "gps-cdcl"
   solver-version = 1

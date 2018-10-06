@@ -8,33 +8,39 @@ type Comment struct {
 	commentID   CommentID
 	pageId      PageID
 	text        string
-	commenterID CommenterID
+	name        string
+	commenter   *Commenter
 	commentedAt time.Time
+}
+
+func (c *Comment) Name() string {
+	return c.name
 }
 
 func NewComment(
 	commentID CommentID,
 	pageID PageID,
 	text string,
-	commenterID CommenterID,
+	name string,
+	commenter *Commenter,
 	commentedAt time.Time,
 ) *Comment {
-	// Commentが絶対守らなくてはならない不変条件はここに
 	return &Comment{
 		commentID:   commentID,
 		pageId:      pageID,
 		text:        text,
-		commenterID: commenterID,
+		name:        name,
+		commenter:   commenter,
 		commentedAt: commentedAt,
 	}
 }
 
-func (c *Comment) CommentID() CommentID {
-	return c.commentID
+func (c *Comment) Commenter() *Commenter {
+	return c.commenter
 }
 
-func (c *Comment) CommenterID() CommenterID {
-	return c.commenterID
+func (c *Comment) CommentID() CommentID {
+	return c.commentID
 }
 
 func (c *Comment) CommentedAt() time.Time {
@@ -47,4 +53,20 @@ func (c *Comment) Text() string {
 
 func (c *Comment) PageID() PageID {
 	return c.pageId
+}
+
+type Commenter struct {
+	userID string
+}
+
+func NewCommenter(userID string) *Commenter {
+	return &Commenter{userID: userID}
+}
+
+func (c *Commenter) UserID() string {
+	return c.userID
+}
+
+func (c *Commenter) CreateComment(commentID CommentID, pageID PageID, text, name string, commentedAt time.Time) *Comment {
+	return NewComment(commentID, pageID, text, name, c, commentedAt)
 }

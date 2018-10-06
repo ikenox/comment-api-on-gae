@@ -1,56 +1,33 @@
 package presenter
 
 import (
-	"comment-api-on-gae/commenting/usecase"
+	"comment-api-on-gae/commenting/domain"
 )
 
-type commentWithCommenter struct {
-	Comment   *comment   `json:"comment"`
-	Commenter *commenter `json:"commenter"`
-}
-
 type comment struct {
-	CommentId   int64     `json:"commentId"`
-	PageId      string    `json:"pageId"`
-	Text        string    `json:"text"`
-	CommentedAt jsonTime `json:"commentedAt"`
+	CommentId   int64      `json:"commentId"`
+	PageId      string     `json:"pageId"`
+	Text        string     `json:"text"`
+	CommentedAt jsonTime   `json:"commentedAt"`
+	Name        string     `json:"name"`
+	Commenter   *commenter `json:"commenter"`
 }
 
 type commenter struct {
-	UserID      string `json:"userId"`
-	CommenterID int64  `json:"commenterId"`
-	Name        string `json:"name"`
+	UserID string `json:"userId"`
 }
 
 type CommentPresenter struct{}
 
-func (p *CommentPresenter) RenderArray(d []*usecase.CommentWithCommenter) []*commentWithCommenter {
-	json := make([]*commentWithCommenter, len(d))
-	for i, c := range d {
-		json[i] = p.Render(c)
+func (p *CommentPresenter) Render(c *domain.Comment) *comment {
+	return &comment{
+		CommentId:   int64(c.CommentID()),
+		PageId:      string(c.PageID()),
+		Text:        c.Text(),
+		CommentedAt: jsonTime{c.CommentedAt()},
+		Name:        c.Name(),
+		Commenter: &commenter{
+			UserID: c.Commenter().UserID(),
+		},
 	}
-	return json
-}
-
-func (p *CommentPresenter) Render(d *usecase.CommentWithCommenter) *commentWithCommenter {
-	obj := &commentWithCommenter{}
-	if d == nil {
-		return nil
-	}
-	if d.Comment != nil {
-		obj.Comment = &comment{
-			CommentId:   int64(d.Comment.CommentID()),
-			PageId:      string(d.Comment.PageID()),
-			Text:        d.Comment.Text(),
-			CommentedAt: jsonTime{d.Comment.CommentedAt()},
-		}
-	}
-	if d.Commenter != nil {
-		obj.Commenter = &commenter{
-			UserID:      string(d.Commenter.UserID()),
-			CommenterID: int64(d.Commenter.CommenterID()),
-			Name:        string(d.Commenter.Name()),
-		}
-	}
-	return obj
 }

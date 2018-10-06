@@ -16,6 +16,6 @@ func NewPage(pageId PageID) *Page {
 	}
 }
 
-func (p *Page) PageId() PageID {
+func (p *Page) PageID() PageID {
 	return p.pageID
 }
