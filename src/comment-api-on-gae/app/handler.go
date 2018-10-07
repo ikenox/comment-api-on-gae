@@ -8,8 +8,11 @@ import (
 	"github.com/labstack/echo/engine"
 	"github.com/labstack/echo/engine/standard"
 	"github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/color"
 	"google.golang.org/appengine"
+	"google.golang.org/appengine/log"
 	"net/http"
+	"runtime"
 )
 
 func NewServer() http.Handler {
@@ -19,7 +22,15 @@ func NewServer() http.Handler {
 }
 
 func NewEcho() engine.Handler {
+
 	e := echo.New()
+
+	e.SetHTTPErrorHandler(func(e error, context echo.Context) {
+		stackSize :=4 << 10
+		stack := make([]byte, stackSize)
+		length := runtime.Stack(stack, true)
+		log.Errorf(context.StdContext(), "[%s] %s %s", color.Red("PANIC RECOVER"), e, stack[:length])
+	})
 
 	if env.IsProduction {
 		e.Use(middleware.Recover())

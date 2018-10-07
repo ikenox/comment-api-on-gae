@@ -53,6 +53,7 @@ $ GOPATH=/path/to/comment-api-on-gae goapp deploy app
 - issue service account
    - firebase data manager
    - pubsub publisher/subscriber
+- rewrite yaml
 
 ### Firebase
 
@@ -62,7 +63,7 @@ $ GOPATH=/path/to/comment-api-on-gae goapp deploy app
 
 - create topic
 
-gcloud beta pubsub topics create CommentPosted
+gcloud beta pubsub topics create domain-event
 gcloud beta pubsub subscriptions create comment-api-domain-event \
     --topic domain-event \
     --push-endpoint \
