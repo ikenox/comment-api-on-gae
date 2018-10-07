@@ -87,16 +87,18 @@ func (u *CommentUseCase) PostComment(idToken string, name string, strPageId stri
 
 	// TODO イベントpublish部分の実装やインターフェースが雑
 	// TODO 実践ドメイン駆動設計ではドメイン層からpublishしているがどうすべきか
-	// TODO きちんとイベントタイプごとにstructを定義
+	// TODO きちんとイベントタイプごとにstructを定義してinterface層でmessageに変換
 	u.publisher.Publish("CommentPosted", struct {
 		// TODO jsonへのマッピングはinterface層の責務？
 		CommentID int64  `json:"commentId"`
+		PageID    string `json:"pageId"`
 		Name      string `json:"name"`
 		Text      string `json:"text"`
 	}{
 		CommentID: int64(comment.CommentID()),
 		Name:      comment.Name(),
 		Text:      comment.Text(),
+		PageID:    string(comment.PageID()),
 	})
 	// TODO アプリケーションログのフォーマットのベタープラクティス
 	u.log.Infof("label:CommentPosted,name:%s,comment:%s", name, text)
@@ -135,12 +137,14 @@ func (u *CommentUseCase) DeleteComment(idToken string, commentIDStr string) *use
 
 	u.publisher.Publish("CommentDeleted", struct {
 		CommentID int64  `json:"commentId"`
+		PageID    string `json:"pageId"`
 		Name      string `json:"name"`
 		Text      string `json:"text"`
 	}{
 		CommentID: int64(comment.CommentID()),
 		Name:      comment.Name(),
-		Text:      comment.Text(),
+		Text:      comment.Text()[0:100],
+		PageID:    string(comment.PageID()),
 	})
 
 	return usecase.NewResult(usecase.OK, "")

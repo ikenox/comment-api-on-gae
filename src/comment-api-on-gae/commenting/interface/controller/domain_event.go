@@ -38,17 +38,17 @@ func (ctl *DomainEventController) Dispatch(c echo.Context) error {
 	case "CommentPosted":
 		// FIXME int64として受け取りたい
 		commentId, _ := event.Data["commentId"].(float64)
+		pageId, _ := event.Data["pageId"].(string)
 		name, _ := event.Data["name"].(string)
 		text, _ := event.Data["text"].(string)
-		u_notification.NotifyCommentPosted(ctx, int64(commentId), name, text)
+		u_notification.NotifyCommentPosted(ctx, int64(commentId), pageId, name, text)
 	case "CommentDeleted":
 		// FIXME int64として受け取りたい
 		commentId, _ := event.Data["commentId"].(float64)
+		pageId, _ := event.Data["pageId"].(string)
 		name, _ := event.Data["name"].(string)
 		text, _ := event.Data["text"].(string)
-		u_notification.NotifyCommentDeleted(ctx, int64(commentId), name, text)
-	default:
-		return c.JSON(http.StatusBadRequest, nil)
+		u_notification.NotifyCommentDeleted(ctx, int64(commentId), pageId, name, text)
 	}
 
 	return nil
