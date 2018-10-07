@@ -2,8 +2,11 @@ package controller
 
 import (
 	u_notification "comment-api-on-gae/notification/usecase"
+	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo"
+	"net/http"
+	"time"
 )
 
 type DomainEventController struct{}
@@ -14,18 +17,22 @@ func NewDomainEventController() *DomainEventController {
 
 func (ctl *DomainEventController) Dispatch(c echo.Context) error {
 	ctx := c.StdContext()
+
 	// TODO subscribeに関する実装のリファクタ、クラスの適切な分割など
 	// TODO 各コンテキストに1つずつdispatcherを用意してそれらをhandlerから呼び出すようにする
 	// TODO イベントタイプは意図しない重複防ぐためにenumかなんかで定義、stringでハードコードしないように改修
-
-	event := &struct {
-		EventType string                 `json:"eventType"`
-		Data      map[string]interface{} `json:"data"`
-	}{}
-	if err := c.Bind(event); err != nil {
-		return err
+	msg := &pushRequest{}
+	if err := json.NewDecoder(c.Request().Body()).Decode(msg); err != nil {
+		return c.HTML(http.StatusBadRequest, fmt.Sprintf("Could not decode body: %v", err))
 	}
-	println(fmt.Sprintf("%#v", event))
+	event := struct {
+		Data      map[string]interface{} `json:"data"`
+		EventType string                 `json:"eventType"`
+	}{}
+	err := json.Unmarshal([]byte(msg.Message.Data), &event)
+	if err != nil {
+		return c.HTML(http.StatusBadRequest, fmt.Sprintf("Could not unmarshal message: %v", err))
+	}
 
 	switch event.EventType {
 	case "CommentPosted":
@@ -40,7 +47,18 @@ func (ctl *DomainEventController) Dispatch(c echo.Context) error {
 		name, _ := event.Data["name"].(string)
 		text, _ := event.Data["text"].(string)
 		u_notification.NotifyCommentDeleted(ctx, int64(commentId), name, text)
+	default:
+		return c.JSON(http.StatusBadRequest, nil)
 	}
 
 	return nil
+}
+
+type pushRequest struct {
+	Message struct {
+		Data        []byte    `json:"data"`
+		MessageID   string    `json:"messageId"`
+		PublishTime time.Time `json:"publishTime"`
+	}
+	Subscription string
 }

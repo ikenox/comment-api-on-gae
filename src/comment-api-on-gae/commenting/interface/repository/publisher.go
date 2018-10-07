@@ -1,10 +1,13 @@
 package repository
 
 import (
-	"cloud.google.com/go/pubsub"
 	"comment-api-on-gae/env"
 	"context"
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/pubsub/v1"
 )
 
 type EventPublisher struct {
@@ -16,19 +19,9 @@ func NewPublisher(ctx context.Context) *EventPublisher {
 }
 
 func (p *EventPublisher) Publish(eventType string, data interface{}) {
-	PubsubClient, err := pubsub.NewClient(p.ctx, env.ProjectID, env.GCPCredentialOption)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	t := PubsubClient.Topic("domain-event")
-	if err != nil {
-		panic(err.Error())
-	}
-
 	bytes, err := json.Marshal(struct {
-		Data interface{} `json:"data"`
-		EventType string `json:"eventType"`
+		Data      interface{} `json:"data"`
+		EventType string      `json:"eventType"`
 	}{
 		EventType: eventType,
 		Data:      data,
@@ -37,9 +30,28 @@ func (p *EventPublisher) Publish(eventType string, data interface{}) {
 		panic(err.Error())
 	}
 
-	t.Publish(p.ctx, &pubsub.Message{Data: bytes})
-	//_, err = result.Get(p.ctx)
-	//if err != nil {
-	//	panic(err.Error())
-	//}
+	hcli, err := google.DefaultClient(p.ctx, pubsub.PubsubScope)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	pubsubService, err := pubsub.New(hcli)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// TODO 開発環境だとレスポンス遅いがGCP環境だと大丈夫かどうか
+	_, err = pubsubService.Projects.Topics.Publish(
+		fmt.Sprintf("projects/%s/topics/domain-event", env.ProjectID),
+		&pubsub.PublishRequest{
+			Messages: []*pubsub.PubsubMessage{
+				{
+					Data: base64.StdEncoding.EncodeToString(bytes),
+				},
+			},
+		},
+	).Do()
+	if err != nil {
+		panic(err.Error())
+	}
 }

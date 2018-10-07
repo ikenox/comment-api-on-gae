@@ -15,9 +15,6 @@
     "internal/optional",
     "internal/trace",
     "internal/version",
-    "pubsub",
-    "pubsub/apiv1",
-    "pubsub/internal/distribution",
     "storage"
   ]
   revision = "c728a003b238b26cef9ab6753a5dc424b331c3ad"
@@ -198,15 +195,6 @@
 
 [[projects]]
   branch = "master"
-  name = "golang.org/x/sync"
-  packages = [
-    "errgroup",
-    "semaphore"
-  ]
-  revision = "1d60e4601c6fd243af51cc01ddf169918a5407ca"
-
-[[projects]]
-  branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
   revision = "ad87a3a340fa7f3bed189293fbfa7a9b7e021ae1"
@@ -244,8 +232,8 @@
     "internal",
     "iterator",
     "option",
+    "pubsub/v1",
     "storage/v1",
-    "support/bundler",
     "transport",
     "transport/grpc",
     "transport/http"
@@ -287,11 +275,9 @@
     "googleapis/api/annotations",
     "googleapis/firestore/v1beta1",
     "googleapis/iam/v1",
-    "googleapis/pubsub/v1",
     "googleapis/rpc/code",
     "googleapis/rpc/status",
-    "googleapis/type/latlng",
-    "protobuf/field_mask"
+    "googleapis/type/latlng"
   ]
   revision = "11092d34479b07829b72e10713b159248caf5dad"
 
@@ -332,6 +318,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2f866a757cc725974a5675f09c9839ee8dc518c792c034802ab38c85f4802e8f"
+  inputs-digest = "24bcbaa169f2afc9de4a43cc054b062fb570c85bf3c3f17153053802ad2d818c"
   solver-name = "gps-cdcl"
   solver-version = 1

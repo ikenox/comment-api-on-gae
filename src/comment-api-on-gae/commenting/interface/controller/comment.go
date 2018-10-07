@@ -44,7 +44,7 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 	}{}
 	if err := c.Bind(p); err != nil {
 		// 変換エラーはinterface adapter層における異常系
-		// usecaseでのエラーはinterface adapterにとっては正常系
+		// リクエストの形式がプロトコルに沿ってないため
 		return err
 	}
 
@@ -61,6 +61,7 @@ func (ctl *CommentController) PostComment(c echo.Context) error {
 	data, result := u.PostComment(IDToken, p.Name, p.PageId, p.Text)
 	pr := &presenter.CommentPresenter{}
 	json := pr.Render(data)
+	// usecaseでのエラーはinterface adapterにとっては正常系であり、エラーかどうかは特に意識せず一意に変換できるのが良いと考えた
 	return presenter.RenderJSON(c, json, result)
 }
 

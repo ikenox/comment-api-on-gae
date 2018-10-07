@@ -17,4 +17,4 @@ handlers:
 env_variables:
   SERVICE_ACCOUNT_PATH: ./secrets/comment-api-dev-9162d86d5ce8.json
   IS_PRODUCTION: false
-
+  GOOGLE_APPLICATION_CREDENTIALS: ./secrets/comment-api-dev-9162d86d5ce8.json
