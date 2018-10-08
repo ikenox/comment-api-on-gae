@@ -23,7 +23,7 @@ func init() {
 	ctx := context.Background()
 
 	// FIXME
-	ProjectID = "comment-api-dev"
+	ProjectID = os.Getenv("APP_ID")
 
 	IsProduction = os.Getenv("IS_PRODUCTION") == "True"
 

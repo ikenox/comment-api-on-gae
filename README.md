@@ -53,6 +53,7 @@ $ GOPATH=/path/to/comment-api-on-gae goapp deploy app
 - issue service account
    - firebase data manager
    - pubsub publisher/subscriber
+- add authorized mail sender on appengine console
 - rewrite yaml
 
 ### Firebase

@@ -143,7 +143,7 @@ func (u *CommentUseCase) DeleteComment(idToken string, commentIDStr string) *use
 	}{
 		CommentID: int64(comment.CommentID()),
 		Name:      comment.Name(),
-		Text:      comment.Text()[0:100],
+		Text:      comment.Text(),
 		PageID:    string(comment.PageID()),
 	})
 

@@ -15,6 +15,7 @@ handlers:
     secure: always
 
 env_variables:
+  APP_ID: ikenox-info-comment-api
   SERVICE_ACCOUNT_PATH: ./secrets/ikenox-info-comment-api-75b6f4b1fb2f.json
   IS_PRODUCTION: true
   GOOGLE_APPLICATION_CREDENTIALS: ./secrets/ikenox-info-comment-api-75b6f4b1fb2f.json

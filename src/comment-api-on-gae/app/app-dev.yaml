@@ -15,6 +15,7 @@ handlers:
     secure: always
 
 env_variables:
+  APP_ID: comment-api-dev
   SERVICE_ACCOUNT_PATH: ./secrets/comment-api-dev-9162d86d5ce8.json
   IS_PRODUCTION: false
   GOOGLE_APPLICATION_CREDENTIALS: ./secrets/comment-api-dev-9162d86d5ce8.json
