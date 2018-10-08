@@ -56,7 +56,7 @@ To be written
 Because of Clean Architecture, application logic and domain logic are independent with detail of infrastructure.  
 Followings are not appeared in the core of the application.
 
-- Various packages which is related to Google App Engine
+- Various packages which is related to Google App Engine infrastructure
 - Technological details of web application (e.g. context.Context)
 
 # Setup
