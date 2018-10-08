@@ -22,6 +22,10 @@ So this project has some over-engineered parts.
   - Notification context
 - Commenting API is based on Clean Architecture.
 
+### TODO
+
+- Separate Commenting API Service and Notification Service into different GAE service
+
 ## Domain Driven Design in this project
 
 ### Bounded contexts
