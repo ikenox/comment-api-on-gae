@@ -1,20 +1,45 @@
-# Comment API on GAE
+# Commenting Service on GAE
 
-API server of commenting service which is run on Google App Engine Standard Environment
+An commenting API service using Google App Engine and some Google Cloud Platform Services
 
 ## About this project
 
-This project adopts Clean Architecture and Domain Driven Design, and keeps these principles as much as possible.
+This project aims to learn about followings.
+- Clean Architecture
+- Domain Driven Design
+- MicroServices Architecture (just a little)
+
+This project keeps these principles as much as possible.  
+So there are several parts which is over-engineered.
+
+## Application Architecture Overview
+
+## Domain Driven Design
+
+### Bounded contexts in Commenting Service
+
+#### Commenting domain (core domain)
+
+Post a comment, delete a comment and view posted comments.
+
+#### Notification domain (generic sub domain)
+
+Notify about some events to users or administrators.  
+In this project Google Cloud Pub/Sub are used for publishing/subscribing domain event.
+This domain subscribes domain events and then notifies to appropriate persons.
+
+#### Auth domain (generic sub domain)
+
+This domain helps user authentication.  
+In this project Firebase Authentication Service has auth domain role.
+
+## A benefits of Clean Architecture
 
 Because of Clean Architecture, application logic and domain logic are independent with detail of infrastructure.  
-Followings are not appeared in the core of application.
+Followings are not appeared in the core of the application.
 
-- Various packages related to Google App Engine
+- Various packages which is related to Google App Engine
 - Technological details of web application (e.g. context.Context)
-
-TBW:
-- Application architecture overview
-- Domain model overview
 
 ## Requirements
 
@@ -49,8 +74,8 @@ $ GOPATH=/path/to/comment-api-on-gae goapp deploy app
 
 ### Google App Engine
 
-- create index
-- issue service account
+- Create datastore index
+- issue service account which have following privileges
    - firebase data manager
    - pubsub publisher/subscriber
 - add authorized mail sender on appengine console
