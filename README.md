@@ -1,4 +1,4 @@
-# Commenting API Service on GAE
+# Commenting API service on GAE
 
 An commenting API service which is run on GAE, based on Clean Architecture and Domain Driven Design
 
