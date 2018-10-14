@@ -22,7 +22,6 @@ func NewServer() http.Handler {
 }
 
 func NewEcho() engine.Handler {
-
 	e := echo.New()
 
 	e.SetHTTPErrorHandler(func(e error, context echo.Context) {

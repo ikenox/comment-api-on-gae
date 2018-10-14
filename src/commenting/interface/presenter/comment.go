@@ -20,6 +20,9 @@ type commenter struct {
 type CommentPresenter struct{}
 
 func (p *CommentPresenter) Render(c *domain.Comment) *comment {
+	if c == nil {
+		return nil
+	}
 	return &comment{
 		CommentId:   int64(c.CommentID()),
 		PageId:      string(c.PageID()),
