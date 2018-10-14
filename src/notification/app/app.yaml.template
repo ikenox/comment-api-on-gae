@@ -1,0 +1,23 @@
+application:
+runtime: go
+api_version: go1.8
+version: 1
+module: notification
+
+threadsafe: true
+
+handlers:
+  - url: /_ah/push-handlers/.*
+    script: main.APPLICATION
+    login: admin
+  - url: /.*
+    script: _go_app
+    secure: always
+
+env_variables:
+  APP_ID:
+  SERVICE_ACCOUNT_PATH:
+  IS_PRODUCTION:
+  GOOGLE_APPLICATION_CREDENTIALS:
+  ADMIN_EMAIL:
+  SENDER_EMAIL:

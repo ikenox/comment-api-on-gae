@@ -8,14 +8,12 @@ import (
 	"notification/env"
 )
 
-var systemAdmin = fmt.Sprintf("ikenox+%s@gmail.com", env.ProjectID)
-
 // TODO CleanArchitectureで書き直し
 // 現状だとtoo muchだけど、メールとかの送信部分はラップして共通化しておくべき
 func NotifyCommentPosted(ctx context.Context, commentId int64, pageId, name, text string) {
 	msg := &mail.Message{
-		Sender:   systemAdmin,
-		To:       []string{systemAdmin},
+		Sender:   env.SenderEmail,
+		To:       []string{env.AdminEmail},
 		Subject:  "コメントが投稿されました",
 		Body:     fmt.Sprintf("commentId:%dpageId:%s\nname:%s\ntext:%s\n", commentId, pageId, name, text),
 		HTMLBody: fmt.Sprintf("commentId:%dpageId:%s\nname:%s\ntext:%s\n", commentId, pageId, name, text),
@@ -28,8 +26,8 @@ func NotifyCommentPosted(ctx context.Context, commentId int64, pageId, name, tex
 
 func NotifyCommentDeleted(ctx context.Context, commentId int64, pageId, name, text string) {
 	msg := &mail.Message{
-		Sender:   systemAdmin,
-		To:       []string{systemAdmin},
+		Sender:   env.SenderEmail,
+		To:       []string{env.AdminEmail},
 		Subject:  "コメントが削除されました",
 		Body:     fmt.Sprintf("commentId:%dpageId:%s\nname:%s\ntext:%s\n", commentId, pageId, name, text),
 		HTMLBody: fmt.Sprintf("commentId:%dpageId:%s\nname:%s\ntext:%s\n", commentId, pageId, name, text),

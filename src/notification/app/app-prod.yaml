@@ -19,3 +19,5 @@ env_variables:
   SERVICE_ACCOUNT_PATH: ./secrets/ikenox-info-comment-api-75b6f4b1fb2f.json
   IS_PRODUCTION: true
   GOOGLE_APPLICATION_CREDENTIALS: ./secrets/ikenox-info-comment-api-75b6f4b1fb2f.json
+  ADMIN_EMAIL: ikenox@gmail.com
+  SENDER_EMAIL: ikenox@gmail.com

@@ -1,28 +1,25 @@
 package env
 
 import (
-	"google.golang.org/api/option"
 	"os"
-	"path/filepath"
-	"time"
 )
 
 // application globals
 // アプリにとって普遍とみなせる値や関数、環境変数など？
 // どこからでも使われるような値や概念はRepositoryにするよりグローバル変数にしてしまったほうが楽そう
 var Namespace string
-var CurrentTime func() time.Time
 var IsProduction bool
-var GCPCredentialOption option.ClientOption
 var ProjectID string
+var AdminEmail string
+var SenderEmail string
 
 func init() {
 	ProjectID = os.Getenv("APP_ID")
 
 	IsProduction = os.Getenv("IS_PRODUCTION") == "True"
 
-	// time
-	CurrentTime = time.Now
+	AdminEmail = os.Getenv("ADMIN_EMAIL")
+	SenderEmail = os.Getenv("SENDER_EMAIL")
 
 	// namespace
 	if ns := os.Getenv("NAMESPACE"); ns != "" {
@@ -30,10 +27,4 @@ func init() {
 	} else {
 		Namespace = ""
 	}
-
-	path, err := filepath.Abs(os.Getenv("SERVICE_ACCOUNT_PATH"))
-	if err != nil {
-		panic(err.Error())
-	}
-	GCPCredentialOption = option.WithCredentialsFile(path)
 }
