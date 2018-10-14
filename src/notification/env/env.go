@@ -9,7 +9,7 @@ import (
 
 // application globals
 // アプリにとって普遍とみなせる値や関数、環境変数など？
-// レイヤ関係なく使われるような普遍的な値や概念はRepositoryにするよりグローバル変数にしてしまったほうが楽そう
+// どこからでも使われるような値や概念はRepositoryにするよりグローバル変数にしてしまったほうが楽そう
 var Namespace string
 var CurrentTime func() time.Time
 var IsProduction bool

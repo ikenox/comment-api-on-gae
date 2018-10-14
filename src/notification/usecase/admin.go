@@ -11,7 +11,7 @@ import (
 var systemAdmin = fmt.Sprintf("ikenox+%s@gmail.com", env.ProjectID)
 
 // TODO CleanArchitectureで書き直し
-// 今後ユーザーへの通知とかユーザーごとの通知設定とかを取り扱うのであればやった方良さそう
+// 現状だとtoo muchだけど、メールとかの送信部分はラップして共通化しておくべき
 func NotifyCommentPosted(ctx context.Context, commentId int64, pageId, name, text string) {
 	msg := &mail.Message{
 		Sender:   systemAdmin,
