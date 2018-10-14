@@ -20,6 +20,7 @@ So this project has some over-engineered parts.
   - Commenting context
   - Auth context
   - Notification context
+- These contexts are separated into services which independent of each other, like Microservices.
 - Commenting service is based on Clean Architecture.
 
 ## Domain Driven Design in this project
