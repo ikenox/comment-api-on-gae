@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"commenting/domain"
-	"common/usecase"
 	"strconv"
 
 	"commenting/env"
@@ -36,7 +35,7 @@ func NewCommentUseCase(
 
 var pageIdRegexp = regexp.MustCompile("^[0-9a-zA-Z_\\-]+$")
 
-func (u *CommentUseCase) PostComment(idToken string, name string, strPageId string, text string) (*domain.Comment, *usecase.Result) {
+func (u *CommentUseCase) PostComment(idToken string, name string, strPageId string, text string) (*domain.Comment, *Result) {
 	// ドメイン層でPageIdのバリデーションエラーハンドリングしようとするといたるところにエラーハンドリングが散らばるので極力避けたほういい？
 	// この例だと、NewPageIdがエラー返しちゃうとstring => PageIdの変換をするいたるところにエラーハンドリングのボイラープレートロジックが書かれる
 	// 内側のレイヤなほどerror投げたときにそれをキャッチする処理かかなくてはいけなくなる箇所が増える、永続層から取り出すときとかにもバリデーションが走ることになる
@@ -47,30 +46,30 @@ func (u *CommentUseCase) PostComment(idToken string, name string, strPageId stri
 
 	// pageId
 	if strPageId == "" {
-		return nil, usecase.NewResult(usecase.INVALID, "page id must not be empty.")
+		return nil, NewResult(INVALID, "page id must not be empty.")
 	}
 	if strPageId = pageIdRegexp.Copy().FindString(strPageId); strPageId == "" {
-		return nil, usecase.NewResult(usecase.INVALID, "page id contains invalid character.")
+		return nil, NewResult(INVALID, "page id contains invalid character.")
 	}
 	if len(strPageId) > 64 {
-		return nil, usecase.NewResult(usecase.INVALID, "page id is too long.")
+		return nil, NewResult(INVALID, "page id is too long.")
 	}
 
 	// text
 	if text == "" {
-		return nil, usecase.NewResult(usecase.INVALID, "comment must not be empty.")
+		return nil, NewResult(INVALID, "comment must not be empty.")
 	}
 	if util.LengthOf(text) > 1000 {
-		return nil, usecase.NewResult(usecase.INVALID, "comment should be less than 1000 characters.")
+		return nil, NewResult(INVALID, "comment should be less than 1000 characters.")
 	}
 
 	// name
 	if name == "" {
-		return nil, usecase.NewResult(usecase.INVALID, "name must not be empty.")
+		return nil, NewResult(INVALID, "name must not be empty.")
 	}
 
 	if util.LengthOf(name) > 20 {
-		return nil, usecase.NewResult(usecase.INVALID, "name should be less than 20 characters.")
+		return nil, NewResult(INVALID, "name should be less than 20 characters.")
 	}
 
 	pageId := domain.NewPageID(strPageId)
@@ -103,22 +102,22 @@ func (u *CommentUseCase) PostComment(idToken string, name string, strPageId stri
 	// TODO アプリケーションログのフォーマットのベタープラクティス
 	u.log.Infof("label:CommentPosted,name:%s,comment:%s", name, text)
 
-	return comment, usecase.NewResult(usecase.OK, "")
+	return comment, NewResult(OK, "")
 }
 
-func (u *CommentUseCase) GetComments(strPageID string) ([]*domain.Comment, *usecase.Result) {
+func (u *CommentUseCase) GetComments(strPageID string) ([]*domain.Comment, *Result) {
 	pageId := domain.NewPageID(strPageID)
 
 	page := u.pageRepository.Get(pageId)
 	if page == nil {
-		return []*domain.Comment{}, usecase.NewResult(usecase.OK, "")
+		return []*domain.Comment{}, NewResult(OK, "")
 	}
 
 	comments := u.commentRepository.FindByPageID(page.PageID())
-	return comments, usecase.NewResult(usecase.OK, "")
+	return comments, NewResult(OK, "")
 }
 
-func (u *CommentUseCase) DeleteComment(idToken string, commentIDStr string) *usecase.Result {
+func (u *CommentUseCase) DeleteComment(idToken string, commentIDStr string) *Result {
 	commenter := u.commenterRepository.CurrentCommenter(idToken)
 
 	commentIDInt, err := strconv.ParseInt(commentIDStr, 10, 64)
@@ -128,10 +127,10 @@ func (u *CommentUseCase) DeleteComment(idToken string, commentIDStr string) *use
 	commentID := domain.CommentID(commentIDInt)
 	comment := u.commentRepository.Get(commentID)
 	if comment == nil {
-		return usecase.NewResult(usecase.NOTFOUND, "not found")
+		return NewResult(NOTFOUND, "not found")
 	}
 	if commenter.UserID() != comment.Commenter().UserID() {
-		return usecase.NewResult(usecase.INVALID, "not allowed.")
+		return NewResult(INVALID, "not allowed.")
 	}
 	u.commentRepository.Delete(commentID)
 
@@ -147,5 +146,5 @@ func (u *CommentUseCase) DeleteComment(idToken string, commentIDStr string) *use
 		PageID:    string(comment.PageID()),
 	})
 
-	return usecase.NewResult(usecase.OK, "")
+	return NewResult(OK, "")
 }

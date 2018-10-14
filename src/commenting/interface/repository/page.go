@@ -3,7 +3,7 @@ package repository
 import (
 	"commenting/domain"
 	"commenting/usecase"
-	"common/infra"
+	"commenting/infra"
 	"context"
 )
 

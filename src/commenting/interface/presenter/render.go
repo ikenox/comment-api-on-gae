@@ -1,7 +1,7 @@
 package presenter
 
 import (
-	"common/usecase"
+	"commenting/usecase"
 	"fmt"
 	"github.com/labstack/echo"
 	"net/http"

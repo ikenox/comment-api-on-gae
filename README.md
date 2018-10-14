@@ -65,43 +65,33 @@ Followings are not appeared in the core of the application.
     - dev_appserver.py
 - dep
 
-## Setup for local development
+# For local development
+
+### setup
 
 - Rewrite yaml for your environment
 - Resolve dependencies
     ```shell
-    # /path/to/comment-api-on-gae/src/commenting
+    $ cd /path/to/comment-api-on-gae/src/commenting
+    $ GOPATH=/path/to/comment-api-on-gae dep ensure
+    $ cd /path/to/comment-api-on-gae/src/notification
     $ GOPATH=/path/to/comment-api-on-gae dep ensure
     ```
 
-## Run
+### Run
+
+You can run local servers of `commenting` and `notification` services for development.
 
 ```shell
-# /path/to/comment-api-on-gae/src/commenting
-$ GOPATH=/path/to/comment-api-on-gae dev_appserver.py app --enable_watching_go_path --log_level=debug --datastore_path=.storage
+$ cd /path/to/comment-api-on-gae/src/commenting
+$ GOPATH=/path/to/comment-api-on-gae dev_appserver.py $(pwd)/app/XXX.yaml --enable_watching_go_path --log_level=debug --datastore_path=.storage
+$ cd /path/to/comment-api-on-gae/src/notification
+$ GOPATH=/path/to/comment-api-on-gae dev_appserver.py $(pwd)/app/XXX.yaml --enable_watching_go_path --log_level=debug --datastore_path=.storage
 ```
 
-
-## Test
-
-todo
-
-## Deploy
-
-```shell
-# /path/to/comment-api-on-gae/src/commenting
-$ GOPATH=/path/to/comment-api-on-gae goapp deploy app
-```
+# For production
 
 ## Setup Cloud Services
-
-### Google App Engine
-
-- Create datastore index
-- Issue service account which have following privileges
-   - Firebase data manager
-   - Pubsub editor
-- Add authorized mail sender on Google App Engine console
 
 ### Firebase
 
@@ -110,11 +100,36 @@ $ GOPATH=/path/to/comment-api-on-gae goapp deploy app
 ### Google cloud pubsub
 
 - Create topic `domain-event`
+- Create subscriptions which push to following URLs
+    - `https://commenting-dot-[YOUR-PROJECT-NAME].appspot.com/_ah/push-handlers/domain-event`
+    - `https://notification-dot-[YOUR-PROJECT-NAME].appspot.com/_ah/push-handlers/domain-event`
+    
+### Google App Engine
+
+- Commenting service
+    - Create datastore index
+    - Issue service account which have following privileges
+       - Firebase data manager
+       - Pubsub editor
+- Notification service
+    - Issue service account which have following privileges
+       - Pubsub editor
+    - Add authorized mail sender
+    
+#### Deploy
+
+- Rewrite yaml for your environment
+    
+- Execute following commands
+
+    ```shell
+    $ cd /path/to/comment-api-on-gae/src/commenting
+    $ GOPATH=/path/to/comment-api-on-gae goapp deploy $(pwd)/app/[YOUR-GAE-CONFIG-FILE].yaml
+    $ cd /path/to/comment-api-on-gae/src/notification
+    $ GOPATH=/path/to/comment-api-on-gae goapp deploy $(pwd)/app/[YOUR-GAE-CONFIG-FILE].yaml
     ```
-    gcloud beta pubsub topics create domain-event
-    gcloud beta pubsub subscriptions create comment-api-domain-event \
-        --topic domain-event \
-        --push-endpoint \
-        https://YOUR_PROJECT_ID.appspot.com/_ah/push-handlers/domain-event \
-        --ack-deadline 10
-    ```
+
+
+# Testing
+
+todo

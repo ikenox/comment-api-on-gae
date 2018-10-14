@@ -2,8 +2,6 @@ package usecase
 
 import (
 	"commenting/interface/repository"
-	"commenting/usecase"
-	common_usecase "common/usecase"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/aetest"
@@ -23,10 +21,12 @@ func TestPostComment(t *testing.T) {
 	}
 	ctx := appengine.NewContext(req)
 
-	u := usecase.NewCommentUseCase(
+	u := NewCommentUseCase(
 		repository.NewCommentRepository(ctx),
 		repository.NewCommenterRepository(ctx),
 		repository.NewPageRepository(ctx),
+		repository.NewPublisher(ctx),
+		repository.NewLoggingRepository(ctx),
 	)
 
 	type param struct {
@@ -116,11 +116,11 @@ func TestPostComment(t *testing.T) {
 
 	for _, c := range validCases {
 		_, res := u.PostComment("",c.pageId, c.name, c.text)
-		assert.Equal(t, common_usecase.OK, res.Code())
+		assert.Equal(t, OK, res.Code())
 	}
 
 	for _, c := range invalidCases {
 		_, res := u.PostComment("",c.pageId, c.name, c.text)
-		assert.Equal(t, common_usecase.INVALID, res.Code())
+		assert.Equal(t, INVALID, res.Code())
 	}
 }

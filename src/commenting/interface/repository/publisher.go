@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/pubsub/v1"
+	"google.golang.org/appengine/log"
 )
 
 type EventPublisher struct {
@@ -41,6 +42,7 @@ func (p *EventPublisher) Publish(eventType string, data interface{}) {
 	}
 
 	// TODO 開発環境だとレスポンス遅いがGCP環境だと大丈夫かどうか
+	// ここではローカルのqueueに突っ込むだけにして別でpublishするとかしたほうが安定しそう
 	_, err = pubsubService.Projects.Topics.Publish(
 		fmt.Sprintf("projects/%s/topics/domain-event", env.ProjectID),
 		&pubsub.PublishRequest{
@@ -52,6 +54,6 @@ func (p *EventPublisher) Publish(eventType string, data interface{}) {
 		},
 	).Do()
 	if err != nil {
-		panic(err.Error())
+		log.Errorf(p.ctx, err.Error())
 	}
 }
