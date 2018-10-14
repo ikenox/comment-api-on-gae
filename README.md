@@ -1,13 +1,13 @@
 # Commenting service on Google App Engine
 
-An commenting service which is run on Google App Engine and some Google Cloud Platform services, based on Clean Architecture and Domain Driven Design
+An commenting service which is run on Google App Engine and some Google Cloud Platform services, based on Clean Architecture, Domain Driven Design and Microservices Architecture
 
 ## About this project
 
 This project is built in order to learn about followings.
 - Clean Architecture
 - Domain Driven Design
-- MicroServices Architecture (just a little)
+- Microservices Architecture (just a little)
 
 This project keeps these principles as much as possible.  
 So this project has some over-engineered parts.
