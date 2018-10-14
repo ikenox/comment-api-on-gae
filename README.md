@@ -1,6 +1,6 @@
-# Commenting Service on GAE
+# Commenting API service on Google App Engine
 
-An commenting API service based on Clean Architecture and Domain Driven Design
+An commenting API service which is run on Google App Engine and some Google Cloud Platform services, based on Clean Architecture and Domain Driven Design
 
 ## About this project
 
@@ -21,6 +21,10 @@ So this project has some over-engineered parts.
   - Auth context
   - Notification context
 - Commenting API is based on Clean Architecture.
+
+### TODO
+
+- Separate Commenting API Service and Notification Service into different GAE service
 
 ## Domain Driven Design in this project
 
@@ -52,7 +56,7 @@ To be written
 Because of Clean Architecture, application logic and domain logic are independent with detail of infrastructure.  
 Followings are not appeared in the core of the application.
 
-- Various packages which is related to Google App Engine
+- Various packages which is related to Google App Engine infrastructure
 - Technological details of web application (e.g. context.Context)
 
 # Setup
