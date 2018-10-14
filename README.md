@@ -16,7 +16,7 @@ So this project has some over-engineered parts.
 
 ![](doc/architecture-overview.png)
 
-- This service has 3 bounded contexts.
+- Following Domain Driven Design, this service has 3 bounded contexts.
   - Commenting context
   - Auth context
   - Notification context
@@ -69,7 +69,14 @@ Followings are not appeared in the core of the application.
 
 ### setup
 
-- Rewrite yaml for your environment
+- Create yaml file for your Google App Engine environment
+    ```shell
+    $ cd /path/to/comment-api-on-gae/src/commenting
+    $ cp app/app.template.yaml app/app.yaml
+    $ cd /path/to/comment-api-on-gae/src/notification
+    $ cp app/app.template.yaml app/app.yaml
+    ```
+    
 - Resolve dependencies
     ```shell
     $ cd /path/to/comment-api-on-gae/src/commenting
