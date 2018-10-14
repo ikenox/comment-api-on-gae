@@ -95,9 +95,9 @@ You can run local servers of `commenting` and `notification` services for develo
 
 ```shell
 $ cd /path/to/comment-api-on-gae/src/commenting
-$ GOPATH=/path/to/comment-api-on-gae dev_appserver.py $(pwd)/app/XXX.yaml --enable_watching_go_path --log_level=debug --datastore_path=.storage
+$ GOPATH=/path/to/comment-api-on-gae dev_appserver.py app/XXX.yaml --enable_watching_go_path --log_level=debug --datastore_path=.storage
 $ cd /path/to/comment-api-on-gae/src/notification
-$ GOPATH=/path/to/comment-api-on-gae dev_appserver.py $(pwd)/app/XXX.yaml --enable_watching_go_path --log_level=debug --datastore_path=.storage
+$ GOPATH=/path/to/comment-api-on-gae dev_appserver.py app/XXX.yaml --enable_watching_go_path --log_level=debug --datastore_path=.storage
 ```
 
 # For production
@@ -135,9 +135,9 @@ $ GOPATH=/path/to/comment-api-on-gae dev_appserver.py $(pwd)/app/XXX.yaml --enab
 
     ```shell
     $ cd /path/to/comment-api-on-gae/src/commenting
-    $ GOPATH=/path/to/comment-api-on-gae goapp deploy $(pwd)/app/[YOUR-GAE-CONFIG-FILE].yaml
+    $ GOPATH=/path/to/comment-api-on-gae goapp deploy app/[YOUR-GAE-CONFIG-FILE].yaml
     $ cd /path/to/comment-api-on-gae/src/notification
-    $ GOPATH=/path/to/comment-api-on-gae goapp deploy $(pwd)/app/[YOUR-GAE-CONFIG-FILE].yaml
+    $ GOPATH=/path/to/comment-api-on-gae goapp deploy /app/[YOUR-GAE-CONFIG-FILE].yaml
     ```
 
 
