@@ -1,6 +1,6 @@
 # Commenting API service on GAE
 
-An commenting API service which is run on GAE, based on Clean Architecture and Domain Driven Design
+An commenting API service which is run on Google App Engine and some Google Cloud Platform services, based on Clean Architecture and Domain Driven Design
 
 ## About this project
 
