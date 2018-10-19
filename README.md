@@ -54,7 +54,7 @@ Because of Clean Architecture, application logic and domain logic are independen
 Followings are not appeared in the core of the application.
 
 - Various packages which is related to Google App Engine infrastructure
-- Technological details of web application (e.g. context.Context)
+- Technological details of web application on golang (e.g. context.Context)
 
 # Setup
 
