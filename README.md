@@ -105,7 +105,7 @@ $ GOPATH=/path/to/comment-api-on-gae dev_appserver.py app/XXX.yaml --enable_watc
 
 - Enable anonymous login
 
-### Google cloud pubsub
+### Google Cloud Pub/Sub
 
 - Create topic `domain-event`
 - Create subscriptions which push to following URLs
