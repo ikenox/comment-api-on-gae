@@ -97,7 +97,7 @@ $ cd /path/to/comment-api-on-gae/src/notification
 $ GOPATH=/path/to/comment-api-on-gae dev_appserver.py app/XXX.yaml --enable_watching_go_path --log_level=debug --datastore_path=.storage
 ```
 
-# For production
+# For production/staging
 
 ## Setup Cloud Services
 
