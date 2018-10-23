@@ -1,13 +1,13 @@
-# Commenting API service on Google App Engine
+# Commenting service on Google App Engine
 
-An commenting API service which is run on Google App Engine and some Google Cloud Platform services, based on Clean Architecture and Domain Driven Design
+An commenting service which is run on Google App Engine and some Google Cloud Platform services, based on Clean Architecture, Domain Driven Design and Microservices Architecture
 
 ## About this project
 
 This project is built in order to learn about followings.
 - Clean Architecture
 - Domain Driven Design
-- MicroServices Architecture (just a little)
+- Microservices Architecture (just a little)
 
 This project keeps these principles as much as possible.  
 So this project has some over-engineered parts.
@@ -16,15 +16,12 @@ So this project has some over-engineered parts.
 
 ![](doc/architecture-overview.png)
 
-- Following Domain Driven Design, this service has 3 bounded contexts.
+- Based on Domain Driven Design, this project has 3 bounded contexts.
   - Commenting context
   - Auth context
   - Notification context
-- Commenting API is based on Clean Architecture.
-
-### TODO
-
-- Separate Commenting API Service and Notification Service into different GAE service
+- These contexts are separated into services which independent of each other, like Microservices.
+- Commenting service is based on Clean Architecture.
 
 ## Domain Driven Design in this project
 
@@ -57,7 +54,7 @@ Because of Clean Architecture, application logic and domain logic are independen
 Followings are not appeared in the core of the application.
 
 - Various packages which is related to Google App Engine infrastructure
-- Technological details of web application (e.g. context.Context)
+- Technological details of web application on golang (e.g. context.Context)
 
 # Setup
 
@@ -100,7 +97,7 @@ $ cd /path/to/comment-api-on-gae/src/notification
 $ GOPATH=/path/to/comment-api-on-gae dev_appserver.py app/XXX.yaml --enable_watching_go_path --log_level=debug --datastore_path=.storage
 ```
 
-# For production
+# For production/staging
 
 ## Setup Cloud Services
 
@@ -108,7 +105,7 @@ $ GOPATH=/path/to/comment-api-on-gae dev_appserver.py app/XXX.yaml --enable_watc
 
 - Enable anonymous login
 
-### Google cloud pubsub
+### Google Cloud Pub/Sub
 
 - Create topic `domain-event`
 - Create subscriptions which push to following URLs
