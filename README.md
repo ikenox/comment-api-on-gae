@@ -8,7 +8,9 @@ This project provides commenting API service.
 For example, this API can be called from a commenting form which is put into your blog site.
 By using this API your commenting form can post a comment, delete a comment and get the list of comments. 
 
-This project is built in order to learn about followings.
+### Purpose of this project
+
+A purpose of this project is learning about followings.
 - Clean Architecture
 - Domain Driven Design
 - Microservices Architecture (just a little)
