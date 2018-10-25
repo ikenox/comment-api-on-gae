@@ -6,7 +6,7 @@ An commenting service which is run on Google App Engine and some Google Cloud Pl
 
 This project provides commenting API service.
 For example, this API can be called from a commenting form which is put into your blog site.
-By using this API you can post a comment, delete a comment and get the list of comments. 
+By using this API your commenting form can post a comment, delete a comment and get the list of comments. 
 
 This project is built in order to learn about followings.
 - Clean Architecture
