@@ -130,7 +130,7 @@ $ GOPATH=/path/to/comment-api-on-gae dev_appserver.py app/XXX.yaml --enable_watc
        - Pubsub editor
     - Add authorized mail sender
     
-#### Deploy
+## Deploy
 
 - Rewrite yaml for your environment
     
